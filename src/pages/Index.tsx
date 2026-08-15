@@ -97,7 +97,7 @@ export default function Index() {
     prompt,
     stream,
     think,
-    num_ctx,
+    numCtx,
     temperature,
     numPredict,
   }: {
@@ -105,7 +105,7 @@ export default function Index() {
     prompt: string;
     stream: boolean;
     think: boolean;
-    num_ctx: number;
+    numCtx: number;
     temperature: number;
     numPredict: number;
   }) => {
@@ -121,7 +121,7 @@ export default function Index() {
       stream,
       think,
       options: {
-        num_ctx,
+        num_ctx: numCtx,
         temperature,
         num_predict: numPredict,
       },
