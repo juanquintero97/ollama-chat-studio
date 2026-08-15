@@ -236,18 +236,20 @@ export default function Index() {
               
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col">
-                  <label className="text-sm font-medium">Temperature</label>
-                  <select
-                    value={temperature}
-                    onChange={(e) => setTemperature(parseFloat(e.target.value))}
-                    className="mt-1 block w-full rounded-md border border-input bg-background p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  >
-                    <option value="0.1">0.1</option>
-                    <option value="0.3">0.3</option>
-                    <option value="0.7">0.7</option>
-                    <option value="1">1</option>
-                  </select>
-                </div>
+                                  <label className="text-sm font-medium">Temperature</label>
+                                  <input
+                                    type="range"
+                                    min="0"
+                                    max="1"
+                                    step="0.1"
+                                    value={temperature}
+                                    onChange={(e) => setTemperature(parseFloat(e.target.value))}
+                                    className="mt-1 block w-full"
+                                  />
+                                  <div className="mt-1 text-xs text-gray-500">
+                                    {temperature} ({Math.round(temperature * 10)}0%)
+                                  </div>
+                                </div>
                 
                 <div className="flex flex-col">
                   <label className="text-sm font-medium">Num Predict</label>
