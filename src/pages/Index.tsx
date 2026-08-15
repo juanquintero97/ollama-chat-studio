@@ -235,7 +235,7 @@ export default function Index() {
                       onChange={(e) => setThink(e.target.checked)}
                       className="h-4 w-4 text-primary-600 focus:ring-primary-500"
                     />
-                    <span className="ml-2 text-sm">Show thinking animation</span>
+                    <span className="ml-2 text-sm">Enable thinking response</span>
                   </div>
                 </div>
               </div>
