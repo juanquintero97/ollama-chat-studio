@@ -100,17 +100,19 @@ export function Chat({ messages, loading, responseTime, showTime }: ChatProps) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-lg shadow-sm border border-gray-200">
-      {/* Chat Header */}
-      <div className="p-4 border-b border-gray-200 bg-gray-50">
-        <div className="flex items-center space-x-2">
-          <MessageSquare className="w-5 h-5 text-indigo-600" />
-          <h2 className="text-lg font-semibold text-gray-800">Chat</h2>
+      <div className="flex flex-col h-full bg-white rounded-lg shadow-sm border border-gray-200">
+        {/* Chat Header - Fixed/Sticky */}
+        <div className="sticky top-0 z-10 p-4 border-b border-gray-200 bg-white/95 backdrop-blur-sm">
+          <div className="flex items-center space-x-2">
+            <MessageSquare className="w-5 h-5 text-indigo-600" />
+            <h2 className="text-lg font-semibold text-gray-800">Chat</h2>
+          </div>
         </div>
-      </div>
-
-      {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+  
+        {/* Messages Area - Scrollable */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 relative">
+          {/* Scroll indicator at top when scrolled */}
+          <div className="absolute top-0 left-0 right-0 h-4 bg-gradient-to-b from-gray-50 to-transparent pointer-events-none z-5" />
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-gray-500">
             <MessageSquare className="w-12 h-12 mb-4 text-gray-300" />
