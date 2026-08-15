@@ -3,7 +3,7 @@ import { Chat } from '../components/Chat';
 
 export default function Index() {
   // State for settings
-  const [model, setModel] = useState('granite4.1:3b');
+  const [model, setModel] = useState('phi:2.7b');
   const [models, setModels] = useState<string[]>([]);
   const [prompt, setPrompt] = useState('');
   const [stream, setStream] = useState(false);
@@ -29,7 +29,7 @@ export default function Index() {
         }
       } catch (error) {
         console.error('Error fetching models:', error);
-        setModels(['granite4.1:3b']); // Fallback
+        setModels(['phi:2.7b']); // Fallback
       }
     }
     fetchModels();
@@ -133,6 +133,10 @@ export default function Index() {
       throw new Error(`Error: ${response.status}`);
     }
 
+    // Parse the JSON response and extract the "response" field
+    const data = await response.json();
+    const apiResponse = data.response || data.text || JSON.stringify(data);
+    
     // Handle streaming response
     if (stream) {
       const reader = response.body?.getReader();
@@ -158,8 +162,7 @@ export default function Index() {
       return fullResponse;
     } else {
       // Non-streaming response
-      const responseText = await response.text();
-      return responseText;
+      return apiResponse;
     }
   };
 
@@ -234,18 +237,16 @@ export default function Index() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col">
                   <label className="text-sm font-medium">Temperature</label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.01"
+                  <select
                     value={temperature}
                     onChange={(e) => setTemperature(parseFloat(e.target.value))}
-                    className="mt-1 block w-full"
-                  />
-                  <div className="mt-1 text-xs text-gray-500">
-                    {temperature} ({Math.round(temperature * 100)}%)
-                  </div>
+                    className="mt-1 block w-full rounded-md border border-input bg-background p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  >
+                    <option value="0.1">0.1</option>
+                    <option value="0.3">0.3</option>
+                    <option value="0.7">0.7</option>
+                    <option value="1">1</option>
+                  </select>
                 </div>
                 
                 <div className="flex flex-col">
@@ -276,7 +277,7 @@ export default function Index() {
             
             {showTime && responseTime !== null && (
               <div className="mt-2 p-2 bg-secondary/10 rounded-md text-xs text-secondary">
-                Response time: {responseTime.toFixed(2)} ms
+                Response time: {(responseTime / 1000).toFixed(2)} s
               </div>
             )}
           </div>

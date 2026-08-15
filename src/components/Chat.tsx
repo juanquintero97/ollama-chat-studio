@@ -34,7 +34,9 @@ export function Chat({ messages, loading, responseTime, showTime }: ChatProps) {
         content.includes('{') && content.includes('}')) {
       return (
         <div className="whitespace-pre-wrap break-words">
-          <code>{content}</code>
+          <code className="font-mono text-sm block p-3 bg-gray-900 text-gray-100 rounded-lg overflow-x-auto">
+            {content}
+          </code>
         </div>
       );
     }
