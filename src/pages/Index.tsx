@@ -8,6 +8,7 @@ export default function Index() {
   const [prompt, setPrompt] = useState('');
   const [stream, setStream] = useState(false);
   const [think, setThink] = useState(false);
+  const [num_ctx, setNumCtx] = useState(8192)
   const [temperature, setTemperature] = useState(0.2);
   const [numPredict, setNumPredict] = useState(1024);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -95,6 +96,7 @@ export default function Index() {
     prompt,
     stream,
     think,
+    num_ctx,
     temperature,
     numPredict,
   }: {
@@ -102,6 +104,7 @@ export default function Index() {
     prompt: string;
     stream: boolean;
     think: boolean;
+    num_ctx: number;
     temperature: number;
     numPredict: number;
   }) => {
@@ -117,6 +120,7 @@ export default function Index() {
       stream,
       think,
       options: {
+        num_ctx,
         temperature,
         num_predict: numPredict,
       },
