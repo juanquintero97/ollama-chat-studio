@@ -15,6 +15,7 @@ export default function Index() {
   const [loading, setLoading] = useState(false);
   const [responseTime, setResponseTime] = useState<number | null>(null);
   const [showTime, setShowTime] = useState(false);
+  const systemPrompt: string = "You are an expert software engineer. When writing code, you follow industry best practices, prioritize readability, and ensure efficient algorithms. You provide brief explanations for your technical decisions.";
 
   // Fetch available models from Ollama API
   useEffect(() => {
@@ -117,6 +118,7 @@ export default function Index() {
 
     const body = {
       model,
+      system: systemPrompt,
       prompt,
       stream,
       think,
