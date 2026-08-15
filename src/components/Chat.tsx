@@ -34,7 +34,7 @@ export function Chat({ messages, loading, responseTime, showTime }: ChatProps) {
         content.includes('{') && content.includes('}')) {
       return (
         <div className="relative group">
-          <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm font-mono">
+          <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm font-mono whitespace-pre-wrap">
             <code>{content}</code>
           </pre>
           <button
@@ -49,13 +49,17 @@ export function Chat({ messages, loading, responseTime, showTime }: ChatProps) {
       );
     }
     
-    // Handle regular text with line breaks
-    return content.split('\n').map((line, i) => (
-      <span key={i}>
-        {line}
-        {i < content.split('\n').length - 1 && <br />}
-      </span>
-    ));
+    // Handle regular text with line breaks and word wrap
+    return (
+      <div className="whitespace-pre-wrap break-words">
+        {content.split('\n').map((line, i) => (
+          <span key={i}>
+            {line}
+            {i < content.split('\n').length - 1 && <br />}
+          </span>
+        ))}
+      </div>
+    );
   };
 
   return (

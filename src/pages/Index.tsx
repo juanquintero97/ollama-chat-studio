@@ -3,9 +3,9 @@ import { Chat } from '../components/Chat';
 
 export default function Index() {
   // State for settings
-  const [model, setModel] = useState('stablelm2:1.6b');
+  const [model, setModel] = useState('granite4.1:3b');
   const [models, setModels] = useState<string[]>([]);
-  const [prompt, setPrompt] = useState('Write a Python function called is_prime(n) that returns True if n is prime and False otherwise. Return only the code.');
+  const [prompt, setPrompt] = useState('');
   const [stream, setStream] = useState(false);
   const [think, setThink] = useState(false);
   const [temperature, setTemperature] = useState(0.2);
@@ -22,11 +22,14 @@ export default function Index() {
         const response = await fetch('http://localhost:11434/v1/models');
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
-        const modelNames = Object.keys(data).filter(key => key.startsWith('llama') || key.startsWith('stablelm'));
+        const modelNames = data.data.map((item: { id: string }) => item.id);
         setModels(modelNames);
+        if (modelNames.length > 0) {
+          setModel(modelNames[0]);
+        }
       } catch (error) {
         console.error('Error fetching models:', error);
-        setModels(['stablelm2:1.6b']); // Fallback
+        setModels(['granite4.1:3b']); // Fallback
       }
     }
     fetchModels();
@@ -194,7 +197,7 @@ export default function Index() {
                 <textarea
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  className="mt-1 block w-full rounded-md border border-input bg-background p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 resize-hight"
+                  className="mt-1 block w-full rounded-md border border-input bg-background p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 resize-y"
                   placeholder="Enter your prompt here..."
                   rows={4}
                 />
