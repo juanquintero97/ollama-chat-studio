@@ -4,6 +4,7 @@ import { Chat } from '../components/Chat';
 export default function Index() {
   // State for settings
   const [model, setModel] = useState('stablelm2:1.6b');
+  const [models, setModels] = useState<string[]>([]);
   const [prompt, setPrompt] = useState('Write a Python function called is_prime(n) that returns True if n is prime and False otherwise. Return only the code.');
   const [stream, setStream] = useState(false);
   const [think, setThink] = useState(false);
@@ -13,6 +14,23 @@ export default function Index() {
   const [loading, setLoading] = useState(false);
   const [responseTime, setResponseTime] = useState<number | null>(null);
   const [showTime, setShowTime] = useState(false);
+
+  // Fetch available models from Ollama API
+  useEffect(() => {
+    async function fetchModels() {
+      try {
+        const response = await fetch('http://localhost:11434/v1/models');
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+        const modelNames = Object.keys(data).filter(key => key.startsWith('llama') || key.startsWith('stablelm'));
+        setModels(modelNames);
+      } catch (error) {
+        console.error('Error fetching models:', error);
+        setModels(['stablelm2:1.6b']); // Fallback
+      }
+    }
+    fetchModels();
+  }, []);
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -160,13 +178,15 @@ export default function Index() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium">Model</label>
-                <input
-                  type="text"
+                <select
                   value={model}
                   onChange={(e) => setModel(e.target.value)}
                   className="mt-1 block w-full rounded-md border border-input bg-background p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  placeholder="e.g., stablelm2:1.6b"
-                />
+                >
+                  {models.map(modelName => (
+                    <option key={modelName} value={modelName}>{modelName}</option>
+                  ))}
+                </select>
               </div>
               
               <div>
