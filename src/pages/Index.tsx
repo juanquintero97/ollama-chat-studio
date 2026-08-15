@@ -115,6 +115,7 @@ export default function Index() {
       model,
       prompt,
       stream,
+      think,
       options: {
         temperature,
         num_predict: numPredict,
