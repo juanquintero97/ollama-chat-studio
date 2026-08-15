@@ -25,6 +25,8 @@ export default function Index() {
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
         const modelNames = data.data.map((item: { id: string }) => item.id);
+        // Sort modelNames in ascending order
+        modelNames.sort((a, b) => a.localeCompare(b));
         setModels(modelNames);
         if (modelNames.length > 0) {
           setModel(modelNames[0]);
