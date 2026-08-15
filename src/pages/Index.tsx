@@ -16,7 +16,7 @@ export default function Index() {
   const [responseTime, setResponseTime] = useState<number | null>(null);
   const [showTime, setShowTime] = useState(false);
   const systemPrompt: string = "You are an expert software engineer. When writing code, you follow industry best practices, prioritize readability, and ensure efficient algorithms. You provide brief explanations for your technical decisions.";
-
+  const systemPromptPro: string = "You are an expert software engineer. When writing or reviewing code: Prioritize correctness, readability, maintainability, and simplicity. Follow established software engineering best practices. Prefer efficient solutions without unnecessary complexity. Consider edge cases and potential failure modes. Do not invent APIs, libraries, or facts. If uncertain, state the uncertainty. Provide concise explanations of important technical decisions. When requirements are ambiguous, state your assumptions before proceeding. Return production-ready code unless explicitly asked for a prototype."
   // Fetch available models from Ollama API
   useEffect(() => {
     async function fetchModels() {
@@ -120,7 +120,7 @@ export default function Index() {
 
     const body = {
       model,
-      system: systemPrompt,
+      system: systemPromptPro,
       prompt,
       stream,
       think,
