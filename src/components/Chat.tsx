@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { MessageSquare, User, Clock, Loader2 } from 'lucide-react';
+import { MessageSquare, User, Clock, Loader2, Copy } from 'lucide-react';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -22,34 +22,79 @@ export function Chat({ messages, loading, responseTime, showTime }: ChatProps) {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Format content with word wrap for both code and text
+  // Parse and render markdown content with code blocks
   const formatMessageContent = (content: string) => {
-    // Check if content looks like code
-    if (content.includes('def ') || content.includes('function ') || 
-        content.includes('import ') || content.includes('return ') || 
-        content.includes('```') || content.includes('class ') || 
-        content.includes('for ') || content.includes('while ') || 
-        content.includes('if ') || content.includes('else:') || 
-        content.includes('print(') || content.includes('[') && content.includes(']') && 
-        content.includes('{') && content.includes('}')) {
-      return (
-        <div className="whitespace-pre-wrap break-words">
-          <code className="font-mono text-sm block p-3 bg-gray-900 text-gray-100 rounded-lg overflow-x-auto">
-            {content}
-          </code>
-        </div>
-      );
+    // Split content by code blocks (```...```)
+    const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
+    const parts: { type: 'text' | 'code'; content: string; language?: string }[] = [];
+    let lastIndex = 0;
+    let match;
+
+    while ((match = codeBlockRegex.exec(content)) !== null) {
+      // Add text before the code block
+      if (match.index > lastIndex) {
+        parts.push({
+          type: 'text',
+          content: content.slice(lastIndex, match.index),
+        });
+      }
+      // Add the code block
+      parts.push({
+        type: 'code',
+        content: match[2],
+        language: match[1] || 'text',
+      });
+      lastIndex = match.index + match[0].length;
     }
-    
-    // Handle regular text with line breaks and word wrap
+
+    // Add remaining text
+    if (lastIndex < content.length) {
+      parts.push({
+        type: 'text',
+        content: content.slice(lastIndex),
+      });
+    }
+
+    // If no code blocks found, treat entire content as text
+    if (parts.length === 0) {
+      parts.push({
+        type: 'text',
+        content: content,
+      });
+    }
+
     return (
       <div className="whitespace-pre-wrap break-words">
-        {content.split('\n').map((line, i) => (
-          <span key={i}>
-            {line}
-            {i < content.split('\n').length - 1 && <br />}
-          </span>
-        ))}
+        {parts.map((part, i) => {
+          if (part.type === 'code') {
+            return (
+              <div key={i} className="my-2">
+                <div className="relative group">
+                  <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm font-mono whitespace-pre-wrap break-words">
+                    <code>{part.content}</code>
+                  </pre>
+                  <button
+                    onClick={() => navigator.clipboard.writeText(part.content)}
+                    className="absolute top-2 right-2 p-1 bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <Copy className="w-4 h-4 text-gray-300" />
+                  </button>
+                </div>
+              </div>
+            );
+          }
+          // Render text with line breaks
+          return (
+            <div key={i} className="whitespace-pre-wrap break-words">
+              {part.content.split('\n').map((line, j) => (
+                <span key={j}>
+                  {line}
+                  {j < part.content.split('\n').length - 1 && <br />}
+                </span>
+              ))}
+            </div>
+          );
+        })}
       </div>
     );
   };
