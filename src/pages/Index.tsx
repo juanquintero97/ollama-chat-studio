@@ -8,7 +8,7 @@ export default function Index() {
   const [prompt, setPrompt] = useState('');
   const [stream, setStream] = useState(false);
   const [think, setThink] = useState(false);
-  const [num_ctx, setNumCtx] = useState(8192)
+  const [numCtx, setNumCtx] = useState(8192)
   const [temperature, setTemperature] = useState(0.2);
   const [numPredict, setNumPredict] = useState(1024);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -59,6 +59,7 @@ export default function Index() {
         prompt,
         stream,
         think,
+        numCtx: parseInt(numCtx as string),
         temperature,
         numPredict: parseInt(numPredict as string),
       });
@@ -239,7 +240,7 @@ export default function Index() {
                 </div>
               </div>
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 <div className="flex flex-col">
                                   <label className="text-sm font-medium">Temperature</label>
                                   <input
@@ -255,8 +256,10 @@ export default function Index() {
                                     {temperature} ({Math.round(temperature * 10)}0%)
                                   </div>
                                 </div>
-                
-                <div className="flex flex-col">
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col">
                   <label className="text-sm font-medium">Num Predict</label>
                   <select
                     value={numPredict}
@@ -267,6 +270,17 @@ export default function Index() {
                     <option value="1024">1024 tokens</option>
                     <option value="2048">2048 tokens</option>
                     <option value="4096">4096 tokens</option>
+                  </select>
+                </div>
+                <div className="flex flex-col">
+                  <label className="text-sm font-medium">Num CTX</label>
+                  <select
+                    value={numCtx}
+                    onChange={(e) => setNumCtx(e.target.value)}
+                    className="mt-1 block w-full rounded-md border border-input bg-background p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  >
+                    <option value="4096">4096 tokens</option>
+                    <option value="8192">8192 tokens</option>
                   </select>
                 </div>
               </div>
