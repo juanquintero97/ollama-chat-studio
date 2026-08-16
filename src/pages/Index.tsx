@@ -16,7 +16,7 @@ export default function Index() {
   const [responseTime, setResponseTime] = useState<number | null>(null);
   const [showTime, setShowTime] = useState(false);
   const systemPrompt: string = "You are an expert software engineer. When writing code, you follow industry best practices, prioritize readability, and ensure efficient algorithms. You provide brief explanations for your technical decisions.";
-  const systemPromptPro: string = "You are an expert software engineer. When writing or reviewing code: Prioritize correctness, readability, maintainability, and simplicity. Follow established software engineering best practices. Prefer efficient solutions without unnecessary complexity. Consider edge cases and potential failure modes. Do not invent APIs, libraries, or facts. If uncertain, state the uncertainty. Provide concise explanations of important technical decisions. When requirements are ambiguous, state your assumptions before proceeding. Return production-ready code unless explicitly asked for a prototype. Do not add explanations, comments, Markdown fences, or additional text unless explicitly requested."
+  const systemPromptPro: string = "You are an expert software engineer. When writing or reviewing code: Prioritize correctness, readability, maintainability, and simplicity. Follow established software engineering best practices. Prefer efficient solutions without unnecessary complexity. Consider edge cases and potential failure modes. Do not invent APIs, libraries, or facts. If uncertain, state the uncertainty. Provide concise explanations of important technical decisions. When requirements are ambiguous, state your assumptions before proceeding. Return production-ready code unless explicitly asked for a prototype. Follow the user's requested output format exactly. Do not add explanations, comments, Markdown fences, or additional text unless explicitly requested."
   // Fetch available models from Ollama API
   useEffect(() => {
     async function fetchModels() {
@@ -181,17 +181,16 @@ export default function Index() {
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row h-full">
           {/* Chat Display */}
-          <div className="flex-1 flex flex-col overflow-y-auto">
+          <div className="flex-1 flex flex-col-8 overflow-y-auto">
             <div className="flex-1">
               <Chat messages={messages} loading={loading} responseTime={responseTime} showTime={showTime} />
             </div>
           </div>
           
           {/* Settings Panel */}
-          <div className="w-full md:w-1/2 bg-card rounded-lg p-4 flex flex-col space-y-4">
-            <h2 className="text-lg font-medium">Chat Settings</h2>
-            
+          <div className="w-1/2 bg-card rounded-lg p-4 flex flex-col-4 space-y-4">
             <form onSubmit={handleSubmit} className="space-y-4">
+              <h2 className="text-lg font-medium">Chat Settings</h2>
               <div>
                 <label className="block text-sm font-medium">Model</label>
                 <select
@@ -212,7 +211,7 @@ export default function Index() {
                   onChange={(e) => setPrompt(e.target.value)}
                   className="mt-1 block w-full rounded-md border border-input bg-background p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 resize-y"
                   placeholder="Enter your prompt here..."
-                  rows={4}
+                  rows={15}
                 />
               </div>
               
@@ -263,7 +262,7 @@ export default function Index() {
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-              <div className="flex flex-col">
+                <div className="flex flex-col">
                   <label className="text-sm font-medium">Num Predict</label>
                   <select
                     value={numPredict}
