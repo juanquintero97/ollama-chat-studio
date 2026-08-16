@@ -1,7 +1,5 @@
 import { useEffect, useRef } from 'react';
 import { MessageSquare, User, Clock, Loader2, Copy } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -85,12 +83,15 @@ export function Chat({ messages, loading, responseTime, showTime }: ChatProps) {
               </div>
             );
           }
-          // Render text with markdown
+          // Render text with line breaks
           return (
-            <div key={i} className="markdown-content">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {part.content}
-              </ReactMarkdown>
+            <div key={i} className="whitespace-pre-wrap break-words">
+              {part.content.split('\n').map((line, j) => (
+                <span key={j}>
+                  {line}
+                  {j < part.content.split('\n').length - 1 && <br />}
+                </span>
+              ))}
             </div>
           );
         })}
