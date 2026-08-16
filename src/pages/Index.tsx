@@ -16,7 +16,7 @@ export default function Index() {
   const [responseTime, setResponseTime] = useState<number | null>(null);
   const [showTime, setShowTime] = useState(false);
   const systemPrompt: string = "You are an expert software engineer. When writing code, you follow industry best practices, prioritize readability, and ensure efficient algorithms. You provide brief explanations for your technical decisions.";
-  const systemPromptPro: string = "You are an expert software engineer. When writing or reviewing code: Prioritize correctness, readability, maintainability, and simplicity. Follow established software engineering best practices. Prefer efficient solutions without unnecessary complexity. Consider edge cases and potential failure modes. Do not invent APIs, libraries, or facts. If uncertain, state the uncertainty. Provide concise explanations of important technical decisions. When requirements are ambiguous, state your assumptions before proceeding. Return production-ready code unless explicitly asked for a prototype. Follow the user's requested output format exactly. Do not add explanations, comments, Markdown fences, or additional text unless explicitly requested."
+  const systemPromptPro: string = "You are an expert software engineer. When writing or reviewing code: Prioritize correctness, readability, maintainability, and simplicity. Follow established software engineering best practices. Prefer efficient solutions without unnecessary complexity. Consider edge cases and potential failure modes. Do not invent APIs, libraries, or facts. If uncertain, state the uncertainty. Provide concise explanations of important technical decisions. When requirements are ambiguous, state your assumptions before proceeding. Return production-ready code unless explicitly asked for a prototype. Do not add explanations, comments, Markdown fences, or additional text unless explicitly requested."
   // Fetch available models from Ollama API
   useEffect(() => {
     async function fetchModels() {
@@ -179,17 +179,17 @@ export default function Index() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="container mx-auto px-4 py-8">
-        <div className="flex flex-col md:flex-row h-full">
+        <div className="flex flex-col h-full">
           {/* Chat Display */}
-          <div className="flex-1 flex flex-col overflow-y-auto">
-            <div className="flex-1">
-              <Chat messages={messages} loading={loading} responseTime={responseTime} showTime={showTime} />
-            </div>
-          </div>
+                    <div className="flex-1 flex flex-col overflow-y-auto mb-20">
+                      <div className="flex-1">
+                        <Chat messages={messages} loading={loading} responseTime={responseTime} showTime={showTime} />
+                      </div>
+                    </div>
           
-          {/* Settings Panel */}
-          <div className="w-1/2 bg-card rounded-lg p-4 flex flex-col space-y-4">
-            <h2 className="text-lg font-medium">Chat Settings</h2>
+          {/* Settings Panel - Bottom Fixed */}
+          <div className="fixed bottom-0 right-0 left-0 p-4 bg-white rounded-lg shadow-lg z-50">
+            <h2 className="text-lg font-medium mb-4">Chat Settings</h2>
             
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
