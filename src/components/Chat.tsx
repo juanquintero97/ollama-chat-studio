@@ -1,5 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { MessageSquare, User, Clock, Loader2, Copy } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -83,15 +85,12 @@ export function Chat({ messages, loading, responseTime, showTime }: ChatProps) {
               </div>
             );
           }
-          // Render text with line breaks
+          // Render text with markdown
           return (
-            <div key={i} className="whitespace-pre-wrap break-words">
-              {part.content.split('\n').map((line, j) => (
-                <span key={j}>
-                  {line}
-                  {j < part.content.split('\n').length - 1 && <br />}
-                </span>
-              ))}
+            <div key={i} className="markdown-content">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {part.content}
+              </ReactMarkdown>
             </div>
           );
         })}
@@ -100,19 +99,19 @@ export function Chat({ messages, loading, responseTime, showTime }: ChatProps) {
   };
 
   return (
-      <div className="flex flex-col h-full bg-white rounded-lg shadow-sm border border-gray-200">
-        {/* Chat Header - Fixed/Sticky */}
-        <div className="sticky top-0 z-10 p-4 border-b border-gray-200 bg-white/95 backdrop-blur-sm">
-          <div className="flex items-center space-x-2">
-            <MessageSquare className="w-5 h-5 text-indigo-600" />
-            <h2 className="text-lg font-semibold text-gray-800">Chat</h2>
-          </div>
+    <div className="flex flex-col h-full bg-white rounded-lg shadow-sm border border-gray-200">
+      {/* Chat Header - Fixed/Sticky */}
+      <div className="sticky top-0 z-10 p-4 border-b border-gray-200 bg-white/95 backdrop-blur-sm">
+        <div className="flex items-center space-x-2">
+          <MessageSquare className="w-5 h-5 text-indigo-600" />
+          <h2 className="text-lg font-semibold text-gray-800">Chat</h2>
         </div>
-  
-        {/* Messages Area - Scrollable */}
-                <div className="flex-1 overflow-y-auto max-h-screen p-4 space-y-4 relative">
-                  {/* Scroll indicator at top when scrolled */}
-                  <div className="absolute top-0 left-0 right-0 h-4 bg-gradient-to-b from-gray-50 to-transparent pointer-events-none z-5" />
+      </div>
+
+      {/* Messages Area - Scrollable */}
+      <div className="flex-1 overflow-y-auto max-h-80vh p-4 space-y-4 relative">
+        {/* Scroll indicator at top when scrolled */}
+        <div className="absolute top-0 left-0 right-0 h-4 bg-gradient-to-b from-gray-50 to-transparent pointer-events-none z-5" />
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-gray-500">
             <MessageSquare className="w-12 h-12 mb-4 text-gray-300" />
@@ -143,7 +142,7 @@ export function Chat({ messages, loading, responseTime, showTime }: ChatProps) {
                       </div>
                     )}
                   </div>
-                  
+
                   <div className={`flex-1 ${message.role === 'user' ? 'text-right' : 'text-left'}`}>
                     <div className="text-sm font-medium mb-1">
                       {message.role === 'user' ? 'You' : 'Assistant'}
@@ -163,7 +162,7 @@ export function Chat({ messages, loading, responseTime, showTime }: ChatProps) {
             </div>
           ))
         )}
-        
+
         {/* Loading indicator */}
         {loading && (
           <div className="flex justify-start">
