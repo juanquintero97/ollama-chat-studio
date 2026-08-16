@@ -179,17 +179,17 @@ export default function Index() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="container mx-auto px-4 py-8">
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col md:flex-row h-full">
           {/* Chat Display */}
-                    <div className="flex-1 flex flex-col overflow-y-auto mb-20">
-                      <div className="flex-1">
-                        <Chat messages={messages} loading={loading} responseTime={responseTime} showTime={showTime} />
-                      </div>
-                    </div>
+          <div className="flex-1 flex flex-col overflow-y-auto">
+            <div className="flex-1">
+              <Chat messages={messages} loading={loading} responseTime={responseTime} showTime={showTime} />
+            </div>
+          </div>
           
-          {/* Settings Panel - Bottom Fixed */}
-          <div className="fixed bottom-0 right-0 left-0 p-4 bg-white rounded-lg shadow-lg z-50">
-            <h2 className="text-lg font-medium mb-4">Chat Settings</h2>
+          {/* Settings Panel */}
+          <div className="w-full md:w-1/2 bg-card rounded-lg p-4 flex flex-col space-y-4">
+            <h2 className="text-lg font-medium">Chat Settings</h2>
             
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
