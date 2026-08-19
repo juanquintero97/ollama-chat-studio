@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Chat } from '../components/Chat';
 
+const DEFAULT_SYSTEM_PROMPT = "You are an expert software engineer. When writing or reviewing code: Prioritize correctness, readability, maintainability, and simplicity. Follow established software engineering best practices. Prefer efficient solutions without unnecessary complexity. Consider edge cases and potential failure modes. Do not invent APIs, libraries, or facts. If uncertain, state the uncertainty. Provide concise explanations of important technical decisions. When requirements are ambiguous, state your assumptions before proceeding. Return production-ready code unless explicitly asked for a prototype. Follow the user's requested output format exactly. Do not add explanations, comments, Markdown fences, or additional text unless explicitly requested.";
+
 export default function Index() {
   // State for settings
   const [model, setModel] = useState('phi:2.7b');
@@ -8,16 +10,33 @@ export default function Index() {
   const [prompt, setPrompt] = useState('');
   const [stream, setStream] = useState(false);
   const [think, setThink] = useState(false);
-  const [numCtx, setNumCtx] = useState(8192)
+  const [numCtx, setNumCtx] = useState(8192);
   const [temperature, setTemperature] = useState(0.2);
   const [numPredict, setNumPredict] = useState(1024);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
   const [responseTime, setResponseTime] = useState<number | null>(null);
   const [showTime, setShowTime] = useState(false);
-  const systemPrompt: string = "You are an expert software engineer. When writing code, you follow industry best practices, prioritize readability, and ensure efficient algorithms. You provide brief explanations for your technical decisions.";
-  const systemPromptPro: string = "You are an expert software engineer. When writing or reviewing code: Prioritize correctness, readability, maintainability, and simplicity. Follow established software engineering best practices. Prefer efficient solutions without unnecessary complexity. Consider edge cases and potential failure modes. Do not invent APIs, libraries, or facts. If uncertain, state the uncertainty. Provide concise explanations of important technical decisions. When requirements are ambiguous, state your assumptions before proceeding. Return production-ready code unless explicitly asked for a prototype. Follow the user's requested output format exactly. Do not add explanations, comments, Markdown fences, or additional text unless explicitly requested."
-  // Fetch available models from Ollama API
+  const [isEditingSystemPrompt, setIsEditingSystemPrompt] = useState(false);
+  const [systemPromptContent, setSystemPromptContent] = useState<string>(DEFAULT_SYSTEM_PROMPT);
+  
+  const saveSystemPrompt = () => {
+    localStorage.setItem('ollama_chat_system_prompt', systemPromptContent);
+    setIsEditingSystemPrompt(false);
+  };
+  
+  const resetSystemPrompt = () => {
+    setSystemPromptContent(DEFAULT_SYSTEM_PROMPT);
+    localStorage.removeItem('ollama_chat_system_prompt');
+  };
+  
+  useEffect(() => {
+    const savedPrompt = localStorage.getItem('ollama_chat_system_prompt');
+    if (savedPrompt) {
+      setSystemPromptContent(savedPrompt);
+    }
+  }, []);
+  
   useEffect(() => {
     async function fetchModels() {
       try {
@@ -25,7 +44,6 @@ export default function Index() {
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
         const modelNames = data.data.map((item: { id: string }) => item.id);
-        // Sort modelNames in ascending order
         modelNames.sort((a, b) => a.localeCompare(b));
         setModels(modelNames);
         if (modelNames.length > 0) {
@@ -38,7 +56,7 @@ export default function Index() {
     }
     fetchModels();
   }, []);
-
+  
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,6 +83,7 @@ export default function Index() {
         numCtx: parseInt(numCtx as string),
         temperature,
         numPredict: parseInt(numPredict as string),
+        systemPrompt: systemPromptContent,
       });
       
       const endTime = Date.now();
@@ -93,7 +112,7 @@ export default function Index() {
       setLoading(false);
     }
   };
-
+  
   // Generate text request to Ollama API
   const generateText = async ({
     model,
@@ -103,6 +122,7 @@ export default function Index() {
     numCtx,
     temperature,
     numPredict,
+    systemPrompt,
   }: {
     model: string;
     prompt: string;
@@ -111,16 +131,17 @@ export default function Index() {
     numCtx: number;
     temperature: number;
     numPredict: number;
+    systemPrompt: string;
   }) => {
     // Show thinking animation if think is enabled
     if (think) {
       // In a real app, this would be a visual indicator
       console.log('Model is thinking...');
     }
-
+    
     const body = {
       model,
-      system: systemPromptPro,
+      system: systemPrompt,
       prompt,
       stream,
       think,
@@ -130,7 +151,7 @@ export default function Index() {
         num_predict: numPredict,
       },
     };
-
+    
     const response = await fetch('http://localhost:11434/api/generate', {
       method: 'POST',
       headers: {
@@ -138,11 +159,11 @@ export default function Index() {
       },
       body: JSON.stringify(body),
     });
-
+    
     if (!response.ok) {
       throw new Error(`Error: ${response.status}`);
     }
-
+    
     // Parse the JSON response and extract the "response" field
     const data = await response.json();
     const apiResponse = data.response || data.text || JSON.stringify(data);
@@ -153,10 +174,10 @@ export default function Index() {
       if (!reader) {
         throw new Error('Unable to read response body');
       }
-
+      
       let done = false;
       let fullResponse = '';
-
+      
       while (!done) {
         const { done: streamDone, value } = await reader.read();
         if (streamDone) {
@@ -168,14 +189,14 @@ export default function Index() {
           console.log('Chunk received:', chunk);
         }
       }
-
+      
       return fullResponse;
     } else {
       // Non-streaming response
       return apiResponse;
     }
   };
-
+  
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="container mx-auto px-4 py-8">
@@ -189,8 +210,63 @@ export default function Index() {
           
           {/* Settings Panel */}
           <div className="w-1/2 bg-card rounded-lg p-4 flex flex-col space-y-4">
+            <h2 className="text-lg font-medium">Chat Settings</h2>
+            
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="text-sm font-medium text-blue-900">System Prompt (for Code Generation)</h3>
+                <button
+                  onClick={() => setIsEditingSystemPrompt(!isEditingSystemPrompt)}
+                  className="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 transition-colors"
+                >
+                  {isEditingSystemPrompt ? 'Cancel' : 'Edit'}
+                </button>
+              </div>
+              
+              {!isEditingSystemPrompt ? (
+                <div className="relative">
+                  <p className="text-xs text-blue-800 font-mono bg-white p-3 rounded border border-blue-200 max-h-32 overflow-y-auto">
+                    {systemPromptContent.split(' ').slice(0, 30).join(' ')}...
+                  </p>
+                  <button
+                    onClick={() => setIsEditingSystemPrompt(true)}
+                    className="absolute top-1 right-1 text-blue-600 hover:text-blue-800"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                    </svg>
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <textarea
+                    value={systemPromptContent}
+                    onChange={(e) => setSystemPromptContent(e.target.value)}
+                    className="w-full h-32 text-xs font-mono p-3 rounded border border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter system prompt for code generation..."
+                  />
+                  <div className="flex justify-end space-x-2">
+                    <button
+                      onClick={resetSystemPrompt}
+                      className="px-3 py-1 text-xs text-gray-600 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
+                    >
+                      Reset to Default
+                    </button>
+                    <button
+                      onClick={saveSystemPrompt}
+                      className="px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                    >
+                      Save Prompt
+                    </button>
+                  </div>
+                </div>
+              )}
+              <div className="mt-2 text-xs text-blue-700">
+                <strong>Purpose:</strong> This system prompt guides how the AI generates code. Modify it to customize behavior (e.g., "Focus on Rust performance", "Write tests", "Explain algorithms")
+              </div>
+            </div>
+            
             <form onSubmit={handleSubmit} className="space-y-4">
-              <h2 className="text-lg font-medium">Chat Settings</h2>
               <div>
                 <label className="block text-sm font-medium">Model</label>
                 <select
@@ -245,22 +321,22 @@ export default function Index() {
               
               <div className="grid grid-cols-1 gap-4">
                 <div className="flex flex-col">
-                                  <label className="text-sm font-medium">Temperature</label>
-                                  <input
-                                    type="range"
-                                    min="0"
-                                    max="1"
-                                    step="0.1"
-                                    value={temperature}
-                                    onChange={(e) => setTemperature(parseFloat(e.target.value))}
-                                    className="mt-1 block w-full"
-                                  />
-                                  <div className="mt-1 text-xs text-gray-500">
-                                    {temperature} ({Math.round(temperature * 10)}0%)
-                                  </div>
-                                </div>
+                  <label className="text-sm font-medium">Temperature</label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.1"
+                    value={temperature}
+                    onChange={(e) => setTemperature(parseFloat(e.target.value))}
+                    className="mt-1 block w-full"
+                  />
+                  <div className="mt-1 text-xs text-gray-500">
+                    {temperature} ({Math.round(temperature * 10)}0%)
+                  </div>
+                </div>
               </div>
-
+              
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col">
                   <label className="text-sm font-medium">Num Predict</label>
