@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Chat } from '../components/Chat';
+import { ChatHistory } from '../components/ChatHistory';
+import { DarkModeToggle } from '../components/DarkModeToggle';
 
 const DEFAULT_SYSTEM_PROMPT = "You are an expert software engineer. When writing or reviewing code: Prioritize correctness, readability, maintainability, and simplicity. Follow established software engineering best practices. Prefer efficient solutions without unnecessary complexity. Consider edge cases and potential failure modes. Do not invent APIs, libraries, or facts. If uncertain, state the uncertainty. Provide concise explanations of important technical decisions. When requirements are ambiguous, state your assumptions before proceeding. Return production-ready code unless explicitly asked for a prototype. Follow the user's requested output format exactly. Do not add explanations, comments, Markdown fences, or additional text unless explicitly requested.";
 
@@ -212,7 +214,10 @@ export default function Index() {
           
           {/* Settings Panel */}
           <div className="w-1/2 md:w-1/2 bg-card rounded-lg p-4 flex flex-col space-y-4 max-h-[85vh] overflow-y-auto">
-            <h2 className="text-lg font-medium">Chat Settings</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-medium">Chat Settings</h2>
+              <DarkModeToggle />
+            </div>
             
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
               <div className="flex justify-between items-center mb-2">
@@ -268,6 +273,32 @@ export default function Index() {
               </div>
             </div>
             
+            {/* Chat History */}
+            <ChatHistory
+              currentMessages={messages}
+              currentSettings={{
+                model,
+                temperature,
+                numPredict,
+                numCtx,
+              }}
+              onLoad={(session) => {
+                setMessages(session.messages);
+                setModel(session.model);
+                setTemperature(session.temperature);
+                setNumPredict(session.numPredict);
+                setNumCtx(session.numCtx);
+              }}
+              onClear={() => {
+                setMessages([]);
+                setModel('phi:2.7b');
+                setTemperature(0.2);
+                setNumPredict(1024);
+                setNumCtx(8192);
+                localStorage.removeItem('ollama_chat_sessions');
+              }}
+            />
+            
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium">Model</label>
@@ -289,7 +320,7 @@ export default function Index() {
                   onChange={(e) => setPrompt(e.target.value)}
                   className="mt-1 block w-full rounded-md border border-input bg-background p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 resize-y"
                   placeholder="Enter your prompt here..."
-                  rows={15}
+                  rows={10}
                 />
               </div>
               
