@@ -30,6 +30,7 @@ export default function Index() {
     localStorage.removeItem('ollama_chat_system_prompt');
   };
   
+  // Load saved system prompt on init
   useEffect(() => {
     const savedPrompt = localStorage.getItem('ollama_chat_system_prompt');
     if (savedPrompt) {
@@ -37,6 +38,7 @@ export default function Index() {
     }
   }, []);
   
+  // Fetch available models from Ollama API
   useEffect(() => {
     async function fetchModels() {
       try {
@@ -209,7 +211,7 @@ export default function Index() {
           </div>
           
           {/* Settings Panel */}
-          <div className="w-1/2 bg-card rounded-lg p-4 flex flex-col space-y-4">
+          <div className="w-1/2 md:w-1/2 bg-card rounded-lg p-4 flex flex-col space-y-4 max-h-[85vh] overflow-y-auto">
             <h2 className="text-lg font-medium">Chat Settings</h2>
             
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
