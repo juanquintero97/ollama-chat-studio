@@ -28,5 +28,6 @@ dist-ssr
 /playwright-report/
 /playwright/.cache/
 .last-run.json
-.dyad/
+.dyad/media
+.dyad/screenshot
 .mimocode
