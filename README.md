@@ -6,16 +6,17 @@ A clean, minimal React chat application for interacting with the Ollama localhos
 
 - **Model Selection**: Dropdown populated from installed Ollama models
 - **Prompt Input**: Full-featured textarea for entering prompts
+- **Keyboard Shortcuts**: Quick access to common actions (Cmd+Enter to send, Cmd+K for command palette, Cmd+/ to focus prompt, Esc to clear, Cmd+D for dark mode)
 - **Streaming Support**: View responses character-by-character as they're generated
 - **Think Animation**: Visual indicator when the model is "thinking"
 - **Temperature Control**: Slider (0–1) for controlling randomness
 - **Token Limit**: Configurable `num_predict` with presets (512, 1024, 2048, 4096)
 - **Context Window**: Configurable `num_ctx` with presets (4096, 8192)
 - **System Prompt Editor**: Full editor to customize the system prompt for code generation
+- **Prompt Templates**: Save/load templates with pre-built options for code review, refactor, explain, tests, bug fixes, and documentation
 - **Response Time**: Shows elapsed time for each request
 - **Code Formatting**: Automatic detection and syntax highlighting for code blocks
 - **Copy to Clipboard**: One-click copy button for code snippets
-- **Keyboard Shortcuts**: Quick access to common actions (Cmd+Enter to send, Cmd+K for command palette, Cmd+/ to focus prompt, Esc to clear)
 
 ## Keyboard Shortcuts
 

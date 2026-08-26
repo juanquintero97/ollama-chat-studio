@@ -9,6 +9,7 @@ import { Chat } from '../components/Chat';
 import { ChatHistory } from '../components/ChatHistory';
 import { DarkModeToggle } from '../components/DarkModeToggle';
 import { KeyboardShortcutsDialog, KeyboardShortcutsHelp, SHORTCUTS } from '../components/KeyboardShortcuts';
+import { PromptTemplates, PromptTemplate } from '../components/PromptTemplates';
 
 const DEFAULT_SYSTEM_PROMPT = "You are an expert software engineer. When writing or reviewing code: Prioritize correctness, readability, maintainability, and simplicity. Follow established software engineering best practices. Prefer efficient solutions without unnecessary complexity. Consider edge cases and potential failure modes. Do not invent APIs, libraries, or facts. If uncertain, state the uncertainty. Provide concise explanations of important technical decisions. When requirements are ambiguous, state your assumptions before proceeding. Return production-ready code unless explicitly asked for a prototype. Follow the user's requested output format exactly. Do not add explanations, comments, Markdown fences, or additional text unless explicitly requested.";
 
@@ -30,6 +31,13 @@ export default function Index() {
   const [showTime, setShowTime] = useState(false);
   const [isEditingSystemPrompt, setIsEditingSystemPrompt] = useState(false);
   const [systemPromptContent, setSystemPromptContent] = useState<string>(DEFAULT_SYSTEM_PROMPT);
+  const [activeTemplate, setActiveTemplate] = useState<PromptTemplate | null>(null);
+  const [showTemplates, setShowTemplates] = useState(false);
+
+  const handleSelectTemplate = useCallback((content: string) => {
+    setPrompt(content);
+    setActiveTemplate(null);
+  }, []);
   
   const saveSystemPrompt = () => {
     localStorage.setItem('ollama_chat_system_prompt', systemPromptContent);
@@ -369,33 +377,40 @@ export default function Index() {
             </div>
             
             {/* Chat History */}
-            <ChatHistory
-              currentMessages={messages}
-              currentSettings={{
-                model,
-                temperature,
-                numPredict,
-                numCtx,
-              }}
-              open={showHistoryDialog}
-              onOpenChange={setShowHistoryDialog}
-              onLoad={(session) => {
-                setMessages(session.messages);
-                setModel(session.model);
-                setTemperature(session.temperature);
-                setNumPredict(session.numPredict);
-                setNumCtx(session.numCtx);
-                setShowHistoryDialog(false);
-              }}
-              onClear={() => {
-                setMessages([]);
-                setModel('phi:2.7b');
-                setTemperature(0.2);
-                setNumPredict(1024);
-                setNumCtx(8192);
-                localStorage.removeItem('ollama_chat_sessions');
-              }}
-            />
+            <div className="flex items-center justify-between">
+              <ChatHistory
+                currentMessages={messages}
+                currentSettings={{
+                  model,
+                  temperature,
+                  numPredict,
+                  numCtx,
+                }}
+                open={showHistoryDialog}
+                onOpenChange={setShowHistoryDialog}
+                onLoad={(session) => {
+                  setMessages(session.messages);
+                  setModel(session.model);
+                  setTemperature(session.temperature);
+                  setNumPredict(session.numPredict);
+                  setNumCtx(session.numCtx);
+                  setShowHistoryDialog(false);
+                }}
+                onClear={() => {
+                  setMessages([]);
+                  setModel('phi:2.7b');
+                  setTemperature(0.2);
+                  setNumPredict(1024);
+                  setNumCtx(8192);
+                  localStorage.removeItem('ollama_chat_sessions');
+                }}
+              />
+              <PromptTemplates
+                open={showTemplates}
+                onOpenChange={setShowTemplates}
+                onSelectTemplate={handleSelectTemplate}
+              />
+            </div>
             
             <form onSubmit={handleSubmit} className="space-y-4 md:space-y-3">
               <div>
