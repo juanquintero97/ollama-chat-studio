@@ -33,11 +33,20 @@ interface ChatHistoryProps {
   };
   onLoad: (session: ChatSession) => void;
   onClear: () => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function ChatHistory({ currentMessages, currentSettings, onLoad, onClear }: ChatHistoryProps) {
+export function ChatHistory({ currentMessages, currentSettings, onLoad, onClear, open, onOpenChange }: ChatHistoryProps) {
   const [sessions, setSessions] = useState<ChatSession[]>([]);
-  const [isOpen, setIsOpen] = useState(false);
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
+  const isOpen = open !== undefined ? open : internalIsOpen;
+  const setIsOpen = (val: boolean) => {
+    if (onOpenChange) {
+      onOpenChange(val);
+    }
+    setInternalIsOpen(val);
+  };
 
   // Load saved sessions on mount
   useEffect(() => {

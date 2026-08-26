@@ -1,12 +1,21 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useTheme } from 'next-themes';
+import { motion, AnimatePresence } from 'framer-motion';
+import { MessageSquare, User, Clock, Loader2, Copy, Check } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+
 import { Chat } from '../components/Chat';
 import { ChatHistory } from '../components/ChatHistory';
 import { DarkModeToggle } from '../components/DarkModeToggle';
+import { KeyboardShortcutsDialog, KeyboardShortcutsHelp, SHORTCUTS } from '../components/KeyboardShortcuts';
 
 const DEFAULT_SYSTEM_PROMPT = "You are an expert software engineer. When writing or reviewing code: Prioritize correctness, readability, maintainability, and simplicity. Follow established software engineering best practices. Prefer efficient solutions without unnecessary complexity. Consider edge cases and potential failure modes. Do not invent APIs, libraries, or facts. If uncertain, state the uncertainty. Provide concise explanations of important technical decisions. When requirements are ambiguous, state your assumptions before proceeding. Return production-ready code unless explicitly asked for a prototype. Follow the user's requested output format exactly. Do not add explanations, comments, Markdown fences, or additional text unless explicitly requested.";
 
 export default function Index() {
-  // State for settings
+  const { theme, setTheme, systemTheme } = useTheme();
+  const [showShortcuts, setShowShortcuts] = useState(false);
+  const [showHistoryDialog, setShowHistoryDialog] = useState(false);
   const [model, setModel] = useState('phi:2.7b');
   const [models, setModels] = useState<string[]>([]);
   const [prompt, setPrompt] = useState('');
@@ -60,6 +69,92 @@ export default function Index() {
     }
     fetchModels();
   }, []);
+  
+  const clearMessages = useCallback(() => {
+    setMessages([]);
+    setModel('phi:2.7b');
+    setTemperature(0.2);
+    setNumPredict(1024);
+    setNumCtx(8192);
+    localStorage.removeItem('ollama_chat_sessions');
+  }, []);
+
+  // Global keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const isMod = e.metaKey || e.ctrlKey;
+
+      // Cmd+Enter: Submit the form
+      if (isMod && e.key === 'Enter') {
+        e.preventDefault();
+        const form = document.querySelector('form');
+        if (form) {
+          form.requestSubmit();
+        }
+        return;
+      }
+
+      // Cmd+K: Toggle command palette
+      if (isMod && (e.key === 'k' || e.key === 'K')) {
+        e.preventDefault();
+        setShowShortcuts(prev => !prev);
+        return;
+      }
+
+      // Cmd+/: Focus the prompt textarea
+      if (isMod && e.key === '/') {
+        e.preventDefault();
+        const promptTextarea = document.querySelector(
+          'textarea[name="prompt"]'
+        ) as HTMLTextAreaElement | null;
+        if (promptTextarea) {
+          promptTextarea.focus();
+          promptTextarea.setSelectionRange(
+            promptTextarea.value.length,
+            promptTextarea.value.length
+          );
+        }
+        return;
+      }
+
+      // Cmd+D: Toggle dark mode (bookmark override)
+      if (isMod && (e.key === 'd' || e.key === 'D')) {
+        e.preventDefault();
+        const isDark =
+          theme === 'dark' || (theme === 'system' && systemTheme === 'dark');
+        setTheme(isDark ? 'light' : 'dark');
+        return;
+      }
+
+      // Cmd+Shift+H: Open chat history (Cmd+H is reserved by browsers)
+      if (isMod && e.shiftKey && (e.key === 'H' || e.key === 'h')) {
+        e.preventDefault();
+        setShowHistoryDialog(true);
+        return;
+      }
+
+      // Escape: Clear the current conversation (when not in input)
+      if (e.key === 'Escape') {
+        const target = e.target as HTMLElement;
+        if (
+          target.tagName === 'TEXTAREA' ||
+          target.tagName === 'INPUT' ||
+          target.isContentEditable
+        ) {
+          // Let it blur naturally
+          target.blur();
+        } else {
+          clearMessages();
+        }
+        return;
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [theme, setTheme, systemTheme, clearMessages]);
   
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -282,12 +377,15 @@ export default function Index() {
                 numPredict,
                 numCtx,
               }}
+              open={showHistoryDialog}
+              onOpenChange={setShowHistoryDialog}
               onLoad={(session) => {
                 setMessages(session.messages);
                 setModel(session.model);
                 setTemperature(session.temperature);
                 setNumPredict(session.numPredict);
                 setNumCtx(session.numCtx);
+                setShowHistoryDialog(false);
               }}
               onClear={() => {
                 setMessages([]);
@@ -318,6 +416,7 @@ export default function Index() {
                 <textarea
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
+                  name="prompt"
                   className="mt-1 block w-full rounded-md border border-input bg-background p-2.5 md:p-2 text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 resize-y"
                   placeholder="Enter your prompt here..."
                   rows={10}
@@ -416,6 +515,23 @@ export default function Index() {
           </div>
         </div>
       </div>
+      
+      {/* Keyboard Shortcuts - Help */}
+      <KeyboardShortcutsHelp />
+      
+      {/* Keyboard Shortcuts - Dialog */}
+      {showShortcuts && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/50 z-40"
+            onClick={() => setShowShortcuts(false)}
+          />
+          <KeyboardShortcutsDialog
+            isOpen={showShortcuts}
+            onClose={() => setShowShortcuts(false)}
+          />
+        </>
+      )}
     </div>
   );
 }

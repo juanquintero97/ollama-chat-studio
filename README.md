@@ -15,6 +15,19 @@ A clean, minimal React chat application for interacting with the Ollama localhos
 - **Response Time**: Shows elapsed time for each request
 - **Code Formatting**: Automatic detection and syntax highlighting for code blocks
 - **Copy to Clipboard**: One-click copy button for code snippets
+- **Keyboard Shortcuts**: Quick access to common actions (Cmd+Enter to send, Cmd+K for command palette, Cmd+/ to focus prompt, Esc to clear)
+
+## Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| `Cmd + Enter` | Send the current prompt |
+| `Cmd + K` | Open command palette |
+| `Cmd + /` | Focus the prompt textarea |
+| `Esc` | Clear focus / conversation |
+| `Cmd + D` | Toggle dark mode |
+| `Cmd + Shift + H` | Open chat history |
+- **Keyboard Shortcuts**: Quick access to common actions (Cmd+Enter to send, Cmd+K for command palette, Cmd+/ to focus prompt, Esc to clear)
 
 ## Prerequisites
 
