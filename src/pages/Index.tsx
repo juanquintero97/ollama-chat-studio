@@ -213,18 +213,18 @@ export default function Index() {
           </div>
           
           {/* Settings Panel */}
-          <div className="w-1/2 md:w-1/2 bg-card rounded-lg p-4 flex flex-col space-y-4 max-h-[85vh] overflow-y-auto">
+          <div className="w-full md:w-1/2 lg:w-1/3 bg-card rounded-lg p-4 flex flex-col space-y-4 max-h-[85vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-medium">Chat Settings</h2>
+              <h2 className="text-2xl md:text-3xl font-medium">Chat Settings</h2>
               <DarkModeToggle />
             </div>
             
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
               <div className="flex justify-between items-center mb-2">
-                <h3 className="text-sm font-medium text-blue-900">System Prompt (for Code Generation)</h3>
+                <h3 className="text-base md:text-sm font-medium text-blue-900">System Prompt (for Code Generation)</h3>
                 <button
                   onClick={() => setIsEditingSystemPrompt(!isEditingSystemPrompt)}
-                  className="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 transition-colors"
+                  className="text-sm md:text-xs bg-blue-600 text-white px-3 py-1.5 md:px-2 md:py-1 rounded hover:bg-blue-700 transition-colors min-h-[36px] md:min-h-0"
                 >
                   {isEditingSystemPrompt ? 'Cancel' : 'Edit'}
                 </button>
@@ -232,7 +232,7 @@ export default function Index() {
               
               {!isEditingSystemPrompt ? (
                 <div className="relative">
-                  <p className="text-xs text-blue-800 font-mono bg-white p-3 rounded border border-blue-200 max-h-32 overflow-y-auto">
+                  <p className="text-sm md:text-xs text-blue-800 font-mono bg-white p-3 rounded border border-blue-200 max-h-32 overflow-y-auto">
                     {systemPromptContent.split(' ').slice(0, 30).join(' ')}...
                   </p>
                   <button
@@ -249,26 +249,26 @@ export default function Index() {
                   <textarea
                     value={systemPromptContent}
                     onChange={(e) => setSystemPromptContent(e.target.value)}
-                    className="w-full h-32 text-xs font-mono p-3 rounded border border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full h-32 text-sm md:text-xs font-mono p-3 rounded border border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter system prompt for code generation..."
                   />
                   <div className="flex justify-end space-x-2">
                     <button
                       onClick={resetSystemPrompt}
-                      className="px-3 py-1 text-xs text-gray-600 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
+                      className="px-3 py-1.5 text-sm md:text-xs text-gray-600 bg-gray-100 rounded hover:bg-gray-200 transition-colors min-h-[36px] md:min-h-0"
                     >
                       Reset to Default
                     </button>
                     <button
                       onClick={saveSystemPrompt}
-                      className="px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                      className="px-3 py-1.5 text-sm md:text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors min-h-[36px] md:min-h-0"
                     >
                       Save Prompt
                     </button>
                   </div>
                 </div>
               )}
-              <div className="mt-2 text-xs text-blue-700">
+              <div className="mt-2 text-sm md:text-xs text-blue-700">
                 <strong>Purpose:</strong> This system prompt guides how the AI generates code. Modify it to customize behavior (e.g., "Focus on Rust performance", "Write tests", "Explain algorithms")
               </div>
             </div>
@@ -299,13 +299,13 @@ export default function Index() {
               }}
             />
             
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4 md:space-y-3">
               <div>
-                <label className="block text-sm font-medium">Model</label>
+                <label className="block text-base md:text-sm font-medium">Model</label>
                 <select
                   value={model}
                   onChange={(e) => setModel(e.target.value)}
-                  className="mt-1 block w-full rounded-md border border-input bg-background p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="mt-1 block w-full rounded-md border border-input bg-background p-2.5 md:p-2 text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 min-h-[44px] md:min-h-0"
                 >
                   {models.map(modelName => (
                     <option key={modelName} value={modelName}>{modelName}</option>
@@ -314,11 +314,11 @@ export default function Index() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium">Prompt</label>
+                <label className="block text-base md:text-sm font-medium">Prompt</label>
                 <textarea
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  className="mt-1 block w-full rounded-md border border-input bg-background p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 resize-y"
+                  className="mt-1 block w-full rounded-md border border-input bg-background p-2.5 md:p-2 text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 resize-y"
                   placeholder="Enter your prompt here..."
                   rows={10}
                 />
@@ -326,35 +326,35 @@ export default function Index() {
               
               <div className="flex space-x-4">
                 <div className="flex flex-col">
-                  <label className="text-sm font-medium">Stream</label>
-                  <div className="mt-1 flex items-center">
+                  <label className="text-sm md:text-xs font-medium">Stream</label>
+                  <div className="mt-1.5 flex items-center">
                     <input
                       type="checkbox"
                       checked={stream}
                       onChange={(e) => setStream(e.target.checked)}
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500"
+                      className="h-4 w-4 md:h-5 md:w-5"
                     />
-                    <span className="ml-2 text-sm">Enable streaming response</span>
+                    <span className="ml-2 text-sm md:text-xs">Enable streaming response</span>
                   </div>
                 </div>
                 
                 <div className="flex flex-col">
-                  <label className="text-sm font-medium">Think</label>
-                  <div className="mt-1 flex items-center">
+                  <label className="text-sm md:text-xs font-medium">Think</label>
+                  <div className="mt-1.5 flex items-center">
                     <input
                       type="checkbox"
                       checked={think}
                       onChange={(e) => setThink(e.target.checked)}
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500"
+                      className="h-4 w-4 md:h-5 md:w-5"
                     />
-                    <span className="ml-2 text-sm">Enable thinking response</span>
+                    <span className="ml-2 text-sm md:text-xs">Enable thinking response</span>
                   </div>
                 </div>
               </div>
               
               <div className="grid grid-cols-1 gap-4">
                 <div className="flex flex-col">
-                  <label className="text-sm font-medium">Temperature</label>
+                  <label className="text-sm md:text-xs font-medium">Temperature</label>
                   <input
                     type="range"
                     min="0"
@@ -362,7 +362,7 @@ export default function Index() {
                     step="0.1"
                     value={temperature}
                     onChange={(e) => setTemperature(parseFloat(e.target.value))}
-                    className="mt-1 block w-full"
+                    className="mt-1 block w-full h-2 md:h-2.5"
                   />
                   <div className="mt-1 text-xs text-gray-500">
                     {temperature} ({Math.round(temperature * 10)}0%)
@@ -372,11 +372,11 @@ export default function Index() {
               
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col">
-                  <label className="text-sm font-medium">Num Predict</label>
+                  <label className="text-sm md:text-xs font-medium">Num Predict</label>
                   <select
                     value={numPredict}
                     onChange={(e) => setNumPredict(e.target.value)}
-                    className="mt-1 block w-full rounded-md border border-input bg-background p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="mt-1 block w-full rounded-md border border-input bg-background p-2 text-sm md:text-xs md:p-1.5 focus:outline-none focus:ring-2 focus:ring-primary-500"
                   >
                     <option value="512">512 tokens</option>
                     <option value="1024">1024 tokens</option>
@@ -385,11 +385,11 @@ export default function Index() {
                   </select>
                 </div>
                 <div className="flex flex-col">
-                  <label className="text-sm font-medium">Num CTX</label>
+                  <label className="text-sm md:text-xs font-medium">Num CTX</label>
                   <select
                     value={numCtx}
                     onChange={(e) => setNumCtx(e.target.value)}
-                    className="mt-1 block w-full rounded-md border border-input bg-background p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="mt-1 block w-full rounded-md border border-input bg-background p-2 text-sm md:text-xs md:p-1.5 focus:outline-none focus:ring-2 focus:ring-primary-500"
                   >
                     <option value="4096">4096 tokens</option>
                     <option value="8192">8192 tokens</option>
@@ -401,7 +401,7 @@ export default function Index() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="self-end bg-primary text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-primary/80 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors"
+                  className="self-end bg-primary text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-primary/80 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors min-h-[40px] md:min-h-0"
                 >
                   {loading ? 'Sending...' : 'Send'}
                 </button>
