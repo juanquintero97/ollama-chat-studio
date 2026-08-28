@@ -12,6 +12,7 @@ import { KeyboardShortcutsDialog, KeyboardShortcutsHelp, SHORTCUTS } from '../co
 import { PromptTemplates, PromptTemplate } from '../components/PromptTemplates';
 import { SystemPromptTemplates } from '../components/SystemPromptTemplates';
 import { ModelComparison } from '../components/ModelComparison';
+import { CodeExecution } from '../components/CodeExecution';
 
 const DEFAULT_SYSTEM_PROMPT = "You are an expert software engineer. When writing or reviewing code: Prioritize correctness, readability, maintainability, and simplicity. Follow established software engineering best practices. Prefer efficient solutions without unnecessary complexity. Consider edge cases and potential failure modes. Do not invent APIs, libraries, or facts. If uncertain, state the uncertainty. Provide concise explanations of important technical decisions. When requirements are ambiguous, state your assumptions before proceeding. Return production-ready code unless explicitly asked for a prototype. Follow the user's requested output format exactly. Do not add explanations, comments, Markdown fences, or additional text unless explicitly requested.";
 
@@ -37,6 +38,7 @@ export default function Index() {
   const [showTemplates, setShowTemplates] = useState(false);
   const [showSystemPrompts, setShowSystemPrompts] = useState(false);
   const [showModelComparison, setShowModelComparison] = useState(false);
+  const [showCodeExecution, setShowCodeExecution] = useState(false);
 
   const handleSelectTemplate = useCallback((content: string) => {
     setPrompt(content);
@@ -453,6 +455,13 @@ export default function Index() {
                 numCtx={numCtx}
                 open={showModelComparison}
                 onOpenChange={setShowModelComparison}
+              />
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <CodeExecution
+                open={showCodeExecution}
+                onOpenChange={setShowCodeExecution}
               />
             </div>
             
