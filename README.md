@@ -15,6 +15,7 @@ A clean, minimal React chat application for interacting with the Ollama localhos
 - **System Prompt Editor**: Full editor to customize the system prompt for code generation
 - **Prompt Templates**: Save/load templates with pre-built options for code review, refactor, explain, tests, bug fixes, and documentation
 - **System Prompt Templates**: Apply system prompt templates (Software Engineer, Code Reviewer, Patient Educator, System Architect, Debugging Assistant, Concise Assistant, Technical Writer)
+- **Model Comparison**: Run the same prompt on multiple models side-by-side and compare responses
 - **Response Time**: Shows elapsed time for each request
 - **Code Formatting**: Automatic detection and syntax highlighting for code blocks
 - **Copy to Clipboard**: One-click copy button for code snippets

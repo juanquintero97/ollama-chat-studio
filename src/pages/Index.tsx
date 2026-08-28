@@ -11,6 +11,7 @@ import { DarkModeToggle } from '../components/DarkModeToggle';
 import { KeyboardShortcutsDialog, KeyboardShortcutsHelp, SHORTCUTS } from '../components/KeyboardShortcuts';
 import { PromptTemplates, PromptTemplate } from '../components/PromptTemplates';
 import { SystemPromptTemplates } from '../components/SystemPromptTemplates';
+import { ModelComparison } from '../components/ModelComparison';
 
 const DEFAULT_SYSTEM_PROMPT = "You are an expert software engineer. When writing or reviewing code: Prioritize correctness, readability, maintainability, and simplicity. Follow established software engineering best practices. Prefer efficient solutions without unnecessary complexity. Consider edge cases and potential failure modes. Do not invent APIs, libraries, or facts. If uncertain, state the uncertainty. Provide concise explanations of important technical decisions. When requirements are ambiguous, state your assumptions before proceeding. Return production-ready code unless explicitly asked for a prototype. Follow the user's requested output format exactly. Do not add explanations, comments, Markdown fences, or additional text unless explicitly requested.";
 
@@ -35,6 +36,7 @@ export default function Index() {
   const [activeTemplate, setActiveTemplate] = useState<PromptTemplate | null>(null);
   const [showTemplates, setShowTemplates] = useState(false);
   const [showSystemPrompts, setShowSystemPrompts] = useState(false);
+  const [showModelComparison, setShowModelComparison] = useState(false);
 
   const handleSelectTemplate = useCallback((content: string) => {
     setPrompt(content);
@@ -333,21 +335,29 @@ export default function Index() {
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
               <div className="flex justify-between items-center mb-2">
                 <div className="flex items-center gap-2">
-                  <h3 className="text-base md:text-sm font-medium text-blue-900">System Prompt (for Code Generation)</h3>
+                  <h3 className="text-base md:text-sm font-medium text-blue-900">System Prompt</h3>
                   <div className="flex items-center gap-2">
-                    <SystemPromptTemplates
+                    {/* <SystemPromptTemplates
                       currentPrompt={systemPromptContent}
                       onSelectTemplate={handleSelectSystemTemplate}
                       open={showSystemPrompts}
                       onOpenChange={setShowSystemPrompts}
-                    />
+                    /> */}
                     <button
                       onClick={() => setIsEditingSystemPrompt(!isEditingSystemPrompt)}
-                      className="text-sm md:text-xs bg-blue-600 text-white px-3 py-1.5 md:px-2 md:py-1 rounded hover:bg-blue-700 transition-colors min-h-[36px] md:min-h-0"
+                      className="text-sm md:text-xs bg-blue-600 text-white px-3 py-1.5 md:px-2 md:py-1 rounded hover:bg-blue-700 transition-colors min-h-[36px] md:min-h-0 justify-end"
                     >
                       {isEditingSystemPrompt ? 'Cancel' : 'Edit'}
                     </button>
                   </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <SystemPromptTemplates
+                    currentPrompt={systemPromptContent}
+                    onSelectTemplate={handleSelectSystemTemplate}
+                    open={showSystemPrompts}
+                    onOpenChange={setShowSystemPrompts}
+                  />
                 </div>
               </div>
               
@@ -423,10 +433,26 @@ export default function Index() {
                   localStorage.removeItem('ollama_chat_sessions');
                 }}
               />
+            </div>
+            
+            <div className="flex items-center justify-between">
               <PromptTemplates
                 open={showTemplates}
                 onOpenChange={setShowTemplates}
                 onSelectTemplate={handleSelectTemplate}
+              />
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <ModelComparison
+                models={models}
+                defaultModel={model}
+                systemPrompt={systemPromptContent}
+                temperature={temperature}
+                numPredict={numPredict}
+                numCtx={numCtx}
+                open={showModelComparison}
+                onOpenChange={setShowModelComparison}
               />
             </div>
             
