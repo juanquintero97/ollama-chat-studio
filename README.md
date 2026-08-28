@@ -6,15 +6,32 @@ A clean, minimal React chat application for interacting with the Ollama localhos
 
 - **Model Selection**: Dropdown populated from installed Ollama models
 - **Prompt Input**: Full-featured textarea for entering prompts
+- **Keyboard Shortcuts**: Quick access to common actions (Cmd+Enter to send, Cmd+K for command palette, Cmd+/ to focus prompt, Esc to clear, Cmd+D for dark mode)
 - **Streaming Support**: View responses character-by-character as they're generated
 - **Think Animation**: Visual indicator when the model is "thinking"
 - **Temperature Control**: Slider (0–1) for controlling randomness
 - **Token Limit**: Configurable `num_predict` with presets (512, 1024, 2048, 4096)
 - **Context Window**: Configurable `num_ctx` with presets (4096, 8192)
 - **System Prompt Editor**: Full editor to customize the system prompt for code generation
+- **Prompt Templates**: Save/load templates with pre-built options for code review, refactor, explain, tests, bug fixes, and documentation
+- **System Prompt Templates**: Apply system prompt templates (Software Engineer, Code Reviewer, Patient Educator, System Architect, Debugging Assistant, Concise Assistant, Technical Writer)
+- **Model Comparison**: Run the same prompt on multiple models side-by-side and compare responses
+- **Code Execution**: JavaScript sandbox with Web Worker isolation, 5s timeout, console capture, async support, execution history, copy/download, and example code
 - **Response Time**: Shows elapsed time for each request
 - **Code Formatting**: Automatic detection and syntax highlighting for code blocks
 - **Copy to Clipboard**: One-click copy button for code snippets
+
+## Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| `Cmd + Enter` | Send the current prompt |
+| `Cmd + K` | Open command palette |
+| `Cmd + /` | Focus the prompt textarea |
+| `Esc` | Clear focus / conversation |
+| `Cmd + D` | Toggle dark mode |
+| `Cmd + Shift + H` | Open chat history |
+- **Keyboard Shortcuts**: Quick access to common actions (Cmd+Enter to send, Cmd+K for command palette, Cmd+/ to focus prompt, Esc to clear)
 
 ## Prerequisites
 
