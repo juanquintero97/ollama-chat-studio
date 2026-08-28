@@ -81,9 +81,9 @@ export function ModelComparison({
       prompt,
       stream: false,
       options: {
-        num_ctx: numCtx,
+        num_ctx: parseInt(String(numCtx)),
         temperature,
-        num_predict: numPredict,
+        num_predict: parseInt(String(numPredict)),
       },
     };
 

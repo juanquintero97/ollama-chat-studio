@@ -542,7 +542,7 @@ export default function Index() {
                   <label className="text-sm md:text-xs font-medium">Num Predict</label>
                   <select
                     value={numPredict}
-                    onChange={(e) => setNumPredict(e.target.value)}
+                    onChange={(e) => setNumPredict(parseInt(e.target.value))}
                     className="mt-1 block w-full rounded-md border border-input bg-background p-2 text-sm md:text-xs md:p-1.5 focus:outline-none focus:ring-2 focus:ring-primary-500"
                   >
                     <option value="512">512 tokens</option>
@@ -555,7 +555,7 @@ export default function Index() {
                   <label className="text-sm md:text-xs font-medium">Num CTX</label>
                   <select
                     value={numCtx}
-                    onChange={(e) => setNumCtx(e.target.value)}
+                    onChange={(e) => setNumCtx(parseInt(e.target.value))}
                     className="mt-1 block w-full rounded-md border border-input bg-background p-2 text-sm md:text-xs md:p-1.5 focus:outline-none focus:ring-2 focus:ring-primary-500"
                   >
                     <option value="4096">4096 tokens</option>
