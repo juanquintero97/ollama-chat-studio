@@ -8,8 +8,8 @@ import remarkGfm from 'remark-gfm';
 import { Chat } from '../components/Chat';
 import { ChatHistory } from '../components/ChatHistory';
 import { DarkModeToggle } from '../components/DarkModeToggle';
-import { KeyboardShortcutsDialog, KeyboardShortcutsHelp, SHORTCUTS } from '../components/KeyboardShortcuts';
-import { PromptTemplates, PromptTemplate } from '../components/PromptTemplates';
+import { KeyboardShortcutsDialog, KeyboardShortcutsHelp } from '../components/KeyboardShortcuts';
+import { PromptTemplates } from '../components/PromptTemplates';
 import { SystemPromptTemplates } from '../components/SystemPromptTemplates';
 import { ModelComparison } from '../components/ModelComparison';
 import { CodeExecution } from '../components/CodeExecution';
@@ -34,7 +34,6 @@ export default function Index() {
   const [showTime, setShowTime] = useState(false);
   const [isEditingSystemPrompt, setIsEditingSystemPrompt] = useState(false);
   const [systemPromptContent, setSystemPromptContent] = useState<string>(DEFAULT_SYSTEM_PROMPT);
-  const [activeTemplate, setActiveTemplate] = useState<PromptTemplate | null>(null);
   const [showTemplates, setShowTemplates] = useState(false);
   const [showSystemPrompts, setShowSystemPrompts] = useState(false);
   const [showModelComparison, setShowModelComparison] = useState(false);
@@ -42,7 +41,6 @@ export default function Index() {
 
   const handleSelectTemplate = useCallback((content: string) => {
     setPrompt(content);
-    setActiveTemplate(null);
   }, []);
 
   const handleSelectSystemTemplate = useCallback((content: string) => {
@@ -339,12 +337,6 @@ export default function Index() {
                 <div className="flex items-center gap-2">
                   <h3 className="text-base md:text-sm font-medium text-blue-900">System Prompt</h3>
                   <div className="flex items-center gap-2">
-                    {/* <SystemPromptTemplates
-                      currentPrompt={systemPromptContent}
-                      onSelectTemplate={handleSelectSystemTemplate}
-                      open={showSystemPrompts}
-                      onOpenChange={setShowSystemPrompts}
-                    /> */}
                     <button
                       onClick={() => setIsEditingSystemPrompt(!isEditingSystemPrompt)}
                       className="text-sm md:text-xs bg-blue-600 text-white px-3 py-1.5 md:px-2 md:py-1 rounded hover:bg-blue-700 transition-colors min-h-[36px] md:min-h-0 justify-end"
@@ -353,14 +345,14 @@ export default function Index() {
                     </button>
                   </div>
                 </div>
-                <div className="flex items-center justify-between">
-                  <SystemPromptTemplates
-                    currentPrompt={systemPromptContent}
-                    onSelectTemplate={handleSelectSystemTemplate}
-                    open={showSystemPrompts}
-                    onOpenChange={setShowSystemPrompts}
+              </div>
+              <div className="flex items-center justify-between mb-2">
+                <SystemPromptTemplates
+                  currentPrompt={systemPromptContent}
+                  onSelectTemplate={handleSelectSystemTemplate}
+                  open={showSystemPrompts}
+                  onOpenChange={setShowSystemPrompts}
                   />
-                </div>
               </div>
               
               {!isEditingSystemPrompt ? (

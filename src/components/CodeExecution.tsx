@@ -355,9 +355,9 @@ for (let i = 0; i < 10; i++) {
 
         <div className="flex flex-col h-[calc(90vh-80px)]">
           {/* Main Content Area */}
-          <div className="flex-1 flex overflow-hidden">
+          <div className="flex-1 flex overflow-hidden lg:flex-row flex-col">
             {/* Editor Panel */}
-            <div className="w-full lg:w-1/2 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+            <div className="w-full lg:w-1/2 border-r border-gray-200 dark:border-gray-700 flex flex-col lg:border-r lg:border-b-0">
               <div className="p-4 border-b bg-gray-50 dark:bg-gray-800/50 flex items-center justify-between">
                 <h3 className="font-medium flex items-center gap-2">
                   <span className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
