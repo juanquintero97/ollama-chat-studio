@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTheme } from 'next-themes';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, User, Clock, Loader2, Copy, Check } from 'lucide-react';
@@ -6,20 +6,12 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
 import { Chat } from '../components/Chat';
-import { ChatHistory } from '../components/ChatHistory';
-import { DarkModeToggle } from '../components/DarkModeToggle';
+import { ChatSettings } from '../components/ChatSettings';
 import { KeyboardShortcutsDialog, KeyboardShortcutsHelp } from '../components/KeyboardShortcuts';
-import { PromptTemplates } from '../components/PromptTemplates';
-import { SystemPromptTemplates } from '../components/SystemPromptTemplates';
-import { ModelComparison } from '../components/ModelComparison';
-import { CodeExecution } from '../components/CodeExecution';
-
-const DEFAULT_SYSTEM_PROMPT = "You are an expert software engineer. When writing or reviewing code: Prioritize correctness, readability, maintainability, and simplicity. Follow established software engineering best practices. Prefer efficient solutions without unnecessary complexity. Consider edge cases and potential failure modes. Do not invent APIs, libraries, or facts. If uncertain, state the uncertainty. Provide concise explanations of important technical decisions. When requirements are ambiguous, state your assumptions before proceeding. Return production-ready code unless explicitly asked for a prototype. Follow the user's requested output format exactly. Do not add explanations, comments, Markdown fences, or additional text unless explicitly requested.";
 
 export default function Index() {
   const { theme, setTheme, systemTheme } = useTheme();
   const [showShortcuts, setShowShortcuts] = useState(false);
-  const [showHistoryDialog, setShowHistoryDialog] = useState(false);
   const [model, setModel] = useState('phi:2.7b');
   const [models, setModels] = useState<string[]>([]);
   const [prompt, setPrompt] = useState('');
@@ -33,7 +25,7 @@ export default function Index() {
   const [responseTime, setResponseTime] = useState<number | null>(null);
   const [showTime, setShowTime] = useState(false);
   const [isEditingSystemPrompt, setIsEditingSystemPrompt] = useState(false);
-  const [systemPromptContent, setSystemPromptContent] = useState<string>(DEFAULT_SYSTEM_PROMPT);
+  const [systemPromptContent, setSystemPromptContent] = useState<string>('You are an expert software engineer.');
   const [showTemplates, setShowTemplates] = useState(false);
   const [showSystemPrompts, setShowSystemPrompts] = useState(false);
   const [showModelComparison, setShowModelComparison] = useState(false);
@@ -48,26 +40,33 @@ export default function Index() {
     setIsEditingSystemPrompt(true);
     setShowSystemPrompts(false);
   }, []);
-  
+
   const saveSystemPrompt = () => {
     localStorage.setItem('ollama_chat_system_prompt', systemPromptContent);
     setIsEditingSystemPrompt(false);
   };
-  
+
   const resetSystemPrompt = () => {
-    setSystemPromptContent(DEFAULT_SYSTEM_PROMPT);
+    setSystemPromptContent('You are an expert software engineer.');
     localStorage.removeItem('ollama_chat_system_prompt');
   };
-  
-  // Load saved system prompt on init
+
+  const clearMessages = useCallback(() => {
+    setMessages([]);
+    setModel('phi:2.7b');
+    setTemperature(0.2);
+    setNumPredict(1024);
+    setNumCtx(8192);
+    localStorage.removeItem('ollama_chat_sessions');
+  }, []);
+
   useEffect(() => {
     const savedPrompt = localStorage.getItem('ollama_chat_system_prompt');
     if (savedPrompt) {
       setSystemPromptContent(savedPrompt);
     }
   }, []);
-  
-  // Fetch available models from Ollama API
+
   useEffect(() => {
     async function fetchModels() {
       try {
@@ -82,99 +81,12 @@ export default function Index() {
         }
       } catch (error) {
         console.error('Error fetching models:', error);
-        setModels(['phi:2.7b']); // Fallback
+        setModels(['phi:2.7b']);
       }
     }
     fetchModels();
   }, []);
-  
-  const clearMessages = useCallback(() => {
-    setMessages([]);
-    setModel('phi:2.7b');
-    setTemperature(0.2);
-    setNumPredict(1024);
-    setNumCtx(8192);
-    localStorage.removeItem('ollama_chat_sessions');
-  }, []);
 
-  // Global keyboard shortcuts
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const isMod = e.metaKey || e.ctrlKey;
-
-      // Cmd+Enter: Submit the form
-      if (isMod && e.key === 'Enter') {
-        e.preventDefault();
-        const form = document.querySelector('form');
-        if (form) {
-          form.requestSubmit();
-        }
-        return;
-      }
-
-      // Cmd+K: Toggle command palette
-      if (isMod && (e.key === 'k' || e.key === 'K')) {
-        e.preventDefault();
-        setShowShortcuts(prev => !prev);
-        return;
-      }
-
-      // Cmd+/: Focus the prompt textarea
-      if (isMod && e.key === '/') {
-        e.preventDefault();
-        const promptTextarea = document.querySelector(
-          'textarea[name="prompt"]'
-        ) as HTMLTextAreaElement | null;
-        if (promptTextarea) {
-          promptTextarea.focus();
-          promptTextarea.setSelectionRange(
-            promptTextarea.value.length,
-            promptTextarea.value.length
-          );
-        }
-        return;
-      }
-
-      // Cmd+D: Toggle dark mode (bookmark override)
-      if (isMod && (e.key === 'd' || e.key === 'D')) {
-        e.preventDefault();
-        const isDark =
-          theme === 'dark' || (theme === 'system' && systemTheme === 'dark');
-        setTheme(isDark ? 'light' : 'dark');
-        return;
-      }
-
-      // Cmd+Shift+H: Open chat history (Cmd+H is reserved by browsers)
-      if (isMod && e.shiftKey && (e.key === 'H' || e.key === 'h')) {
-        e.preventDefault();
-        setShowHistoryDialog(true);
-        return;
-      }
-
-      // Escape: Clear the current conversation (when not in input)
-      if (e.key === 'Escape') {
-        const target = e.target as HTMLElement;
-        if (
-          target.tagName === 'TEXTAREA' ||
-          target.tagName === 'INPUT' ||
-          target.isContentEditable
-        ) {
-          // Let it blur naturally
-          target.blur();
-        } else {
-          clearMessages();
-        }
-        return;
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [theme, setTheme, systemTheme, clearMessages]);
-  
-  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!prompt.trim()) return;
@@ -192,23 +104,36 @@ export default function Index() {
     const startTime = Date.now();
     
     try {
-      const response = await generateText({
-        model,
-        prompt,
-        stream,
-        think,
-        numCtx: parseInt(numCtx as string),
-        temperature,
-        numPredict: parseInt(numPredict as string),
-        systemPrompt: systemPromptContent,
+      const response = await fetch('http://localhost:11434/api/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model,
+          prompt,
+          stream,
+          think,
+          num_ctx: parseInt(String(numCtx)),
+          temperature,
+          num_predict: parseInt(String(numPredict)),
+          system: systemPromptContent,
+        }),
       });
+      
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      const apiResponse = data.response || data.text || JSON.stringify(data);
       
       const endTime = Date.now();
       const duration = endTime - startTime;
       
       const botMessage: Message = {
         role: 'assistant',
-        content: response,
+        content: apiResponse,
         timestamp: new Date(),
       };
       
@@ -229,91 +154,67 @@ export default function Index() {
       setLoading(false);
     }
   };
-  
-  // Generate text request to Ollama API
-  const generateText = async ({
-    model,
-    prompt,
-    stream,
-    think,
-    numCtx,
-    temperature,
-    numPredict,
-    systemPrompt,
-  }: {
-    model: string;
-    prompt: string;
-    stream: boolean;
-    think: boolean;
-    numCtx: number;
-    temperature: number;
-    numPredict: number;
-    systemPrompt: string;
-  }) => {
-    // Show thinking animation if think is enabled
-    if (think) {
-      // In a real app, this would be a visual indicator
-      console.log('Model is thinking...');
+
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    const isMod = e.metaKey || e.ctrlKey;
+
+    if (isMod && e.key === 'Enter') {
+      e.preventDefault();
+      const form = document.querySelector('form');
+      if (form) {
+        form.requestSubmit();
+      }
+      return;
     }
-    
-    const body = {
-      model,
-      system: systemPrompt,
-      prompt,
-      stream,
-      think,
-      options: {
-        num_ctx: numCtx,
-        temperature,
-        num_predict: numPredict,
-      },
+
+    if (isMod && (e.key === 'k' || e.key === 'K')) {
+      e.preventDefault();
+      setShowShortcuts(prev => !prev);
+      return;
+    }
+
+    if (isMod && e.key === '/') {
+      e.preventDefault();
+      const promptTextarea = document.querySelector('textarea[name="prompt"]') as HTMLTextAreaElement | null;
+      if (promptTextarea) {
+        promptTextarea.focus();
+        promptTextarea.setSelectionRange(promptTextarea.value.length, promptTextarea.value.length);
+      }
+      return;
+    }
+
+    if (isMod && (e.key === 'd' || e.key === 'D')) {
+      e.preventDefault();
+      const isDark = theme === 'dark' || (theme === 'system' && systemTheme === 'dark');
+      setTheme(isDark ? 'light' : 'dark');
+      return;
+    }
+
+    if (isMod && e.shiftKey && (e.key === 'H' || e.key === 'h')) {
+      e.preventDefault();
+      setShowHistoryDialog(true);
+      return;
+    }
+
+    if (e.key === 'Escape') {
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'TEXTAREA' || target.tagName === 'INPUT' || target.isContentEditable) {
+        target.blur();
+      } else {
+        clearMessages();
+      }
+      return;
+    }
+  }, [theme, setTheme, systemTheme, clearMessages]);
+
+  useEffect(() => {
+    window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
     };
-    
-    const response = await fetch('http://localhost:11434/api/generate', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-    });
-    
-    if (!response.ok) {
-      throw new Error(`Error: ${response.status}`);
-    }
-    
-    // Parse the JSON response and extract the "response" field
-    const data = await response.json();
-    const apiResponse = data.response || data.text || JSON.stringify(data);
-    
-    // Handle streaming response
-    if (stream) {
-      const reader = response.body?.getReader();
-      if (!reader) {
-        throw new Error('Unable to read response body');
-      }
-      
-      let done = false;
-      let fullResponse = '';
-      
-      while (!done) {
-        const { done: streamDone, value } = await reader.read();
-        if (streamDone) {
-          done = true;
-        } else {
-          const chunk = new TextDecoder().decode(value);
-          fullResponse += chunk;
-          // Display chunk as it arrives (in a real app, this would update UI incrementally)
-          console.log('Chunk received:', chunk);
-        }
-      }
-      
-      return fullResponse;
-    } else {
-      // Non-streaming response
-      return apiResponse;
-    }
-  };
-  
+  }, [handleKeyDown]);
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <div className="container mx-auto px-4 py-8">
@@ -326,253 +227,42 @@ export default function Index() {
           </div>
           
           {/* Settings Panel */}
-          <div className="w-full md:w-1/2 lg:w-1/3 bg-card rounded-lg p-4 flex flex-col space-y-4 max-h-[85vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl md:text-3xl font-medium">Chat Settings</h2>
-              <DarkModeToggle />
-            </div>
-            
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-              <div className="flex justify-between items-center mb-2">
-                <div className="flex items-center gap-2">
-                  <h3 className="text-base md:text-sm font-medium text-blue-900">System Prompt</h3>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => setIsEditingSystemPrompt(!isEditingSystemPrompt)}
-                      className="text-sm md:text-xs bg-blue-600 text-white px-3 py-1.5 md:px-2 md:py-1 rounded hover:bg-blue-700 transition-colors min-h-[36px] md:min-h-0 justify-end"
-                    >
-                      {isEditingSystemPrompt ? 'Cancel' : 'Edit'}
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center justify-between mb-2">
-                <SystemPromptTemplates
-                  currentPrompt={systemPromptContent}
-                  onSelectTemplate={handleSelectSystemTemplate}
-                  open={showSystemPrompts}
-                  onOpenChange={setShowSystemPrompts}
-                  />
-              </div>
-              
-              {!isEditingSystemPrompt ? (
-                <div className="relative">
-                  <p className="text-sm md:text-xs text-blue-800 font-mono bg-white p-3 rounded border border-blue-200 max-h-32 overflow-y-auto">
-                    {systemPromptContent.split(' ').slice(0, 30).join(' ')}...
-                  </p>
-                  <button
-                    onClick={() => setIsEditingSystemPrompt(true)}
-                    className="absolute top-1 right-1 text-blue-600 hover:text-blue-800"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                    </svg>
-                  </button>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  <textarea
-                    value={systemPromptContent}
-                    onChange={(e) => setSystemPromptContent(e.target.value)}
-                    className="w-full h-32 text-sm md:text-xs font-mono p-3 rounded border border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter system prompt for code generation..."
-                  />
-                  <div className="flex justify-end space-x-2">
-                    <button
-                      onClick={resetSystemPrompt}
-                      className="px-3 py-1.5 text-sm md:text-xs text-gray-600 bg-gray-100 rounded hover:bg-gray-200 transition-colors min-h-[36px] md:min-h-0"
-                    >
-                      Reset to Default
-                    </button>
-                    <button
-                      onClick={saveSystemPrompt}
-                      className="px-3 py-1.5 text-sm md:text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors min-h-[36px] md:min-h-0"
-                    >
-                      Save Prompt
-                    </button>
-                  </div>
-                </div>
-              )}
-              <div className="mt-2 text-sm md:text-xs text-blue-700">
-                <strong>Purpose:</strong> This system prompt guides how the AI generates code. Modify it to customize behavior (e.g., "Focus on Rust performance", "Write tests", "Explain algorithms")
-              </div>
-            </div>
-            
-            {/* Chat History */}
-            <div className="flex items-center justify-between">
-              <ChatHistory
-                currentMessages={messages}
-                currentSettings={{
-                  model,
-                  temperature,
-                  numPredict,
-                  numCtx,
-                }}
-                open={showHistoryDialog}
-                onOpenChange={setShowHistoryDialog}
-                onLoad={(session) => {
-                  setMessages(session.messages);
-                  setModel(session.model);
-                  setTemperature(session.temperature);
-                  setNumPredict(session.numPredict);
-                  setNumCtx(session.numCtx);
-                  setShowHistoryDialog(false);
-                }}
-                onClear={() => {
-                  setMessages([]);
-                  setModel('phi:2.7b');
-                  setTemperature(0.2);
-                  setNumPredict(1024);
-                  setNumCtx(8192);
-                  localStorage.removeItem('ollama_chat_sessions');
-                }}
-              />
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <PromptTemplates
-                open={showTemplates}
-                onOpenChange={setShowTemplates}
-                onSelectTemplate={handleSelectTemplate}
-              />
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <ModelComparison
-                models={models}
-                defaultModel={model}
-                systemPrompt={systemPromptContent}
-                temperature={temperature}
-                numPredict={numPredict}
-                numCtx={numCtx}
-                open={showModelComparison}
-                onOpenChange={setShowModelComparison}
-              />
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <CodeExecution
-                open={showCodeExecution}
-                onOpenChange={setShowCodeExecution}
-              />
-            </div>
-            
-            <form onSubmit={handleSubmit} className="space-y-4 md:space-y-3">
-              <div>
-                <label className="block text-base md:text-sm font-medium">Model</label>
-                <select
-                  value={model}
-                  onChange={(e) => setModel(e.target.value)}
-                  className="mt-1 block w-full rounded-md border border-input bg-background p-2.5 md:p-2 text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 min-h-[44px] md:min-h-0"
-                >
-                  {models.map(modelName => (
-                    <option key={modelName} value={modelName}>{modelName}</option>
-                  ))}
-                </select>
-              </div>
-              
-              <div>
-                <label className="block text-base md:text-sm font-medium">Prompt</label>
-                <textarea
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  name="prompt"
-                  className="mt-1 block w-full rounded-md border border-input bg-background p-2.5 md:p-2 text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 resize-y"
-                  placeholder="Enter your prompt here..."
-                  rows={10}
-                />
-              </div>
-              
-              <div className="flex space-x-4">
-                <div className="flex flex-col">
-                  <label className="text-sm md:text-xs font-medium">Stream</label>
-                  <div className="mt-1.5 flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={stream}
-                      onChange={(e) => setStream(e.target.checked)}
-                      className="h-4 w-4 md:h-5 md:w-5"
-                    />
-                    <span className="ml-2 text-sm md:text-xs">Enable streaming response</span>
-                  </div>
-                </div>
-                
-                <div className="flex flex-col">
-                  <label className="text-sm md:text-xs font-medium">Think</label>
-                  <div className="mt-1.5 flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={think}
-                      onChange={(e) => setThink(e.target.checked)}
-                      className="h-4 w-4 md:h-5 md:w-5"
-                    />
-                    <span className="ml-2 text-sm md:text-xs">Enable thinking response</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 gap-4">
-                <div className="flex flex-col">
-                  <label className="text-sm md:text-xs font-medium">Temperature</label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.1"
-                    value={temperature}
-                    onChange={(e) => setTemperature(parseFloat(e.target.value))}
-                    className="mt-1 block w-full h-2 md:h-2.5"
-                  />
-                  <div className="mt-1 text-xs text-gray-500">
-                    {temperature} ({Math.round(temperature * 10)}0%)
-                  </div>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col">
-                  <label className="text-sm md:text-xs font-medium">Num Predict</label>
-                  <select
-                    value={numPredict}
-                    onChange={(e) => setNumPredict(parseInt(e.target.value))}
-                    className="mt-1 block w-full rounded-md border border-input bg-background p-2 text-sm md:text-xs md:p-1.5 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  >
-                    <option value="512">512 tokens</option>
-                    <option value="1024">1024 tokens</option>
-                    <option value="2048">2048 tokens</option>
-                    <option value="4096">4096 tokens</option>
-                  </select>
-                </div>
-                <div className="flex flex-col">
-                  <label className="text-sm md:text-xs font-medium">Num CTX</label>
-                  <select
-                    value={numCtx}
-                    onChange={(e) => setNumCtx(parseInt(e.target.value))}
-                    className="mt-1 block w-full rounded-md border border-input bg-background p-2 text-sm md:text-xs md:p-1.5 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  >
-                    <option value="4096">4096 tokens</option>
-                    <option value="8192">8192 tokens</option>
-                  </select>
-                </div>
-              </div>
-              
-              <div className="flex items-end">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="self-end bg-primary text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-primary/80 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors min-h-[40px] md:min-h-0"
-                >
-                  {loading ? 'Sending...' : 'Send'}
-                </button>
-              </div>
-            </form>
-            
-            {showTime && responseTime !== null && (
-              <div className="mt-2 p-2 bg-secondary/10 rounded-md text-xs text-secondary">
-                Response time: {(responseTime / 1000).toFixed(2)} s
-              </div>
-            )}
-          </div>
+          <ChatSettings
+            model={model}
+            models={models}
+            temperature={temperature}
+            numCtx={numCtx}
+            numPredict={numPredict}
+            stream={stream}
+            think={think}
+            systemPromptContent={systemPromptContent}
+            isEditingSystemPrompt={isEditingSystemPrompt}
+            showSystemPrompts={showSystemPrompts}
+            showTemplates={showTemplates}
+            showModelComparison={showModelComparison}
+            showCodeExecution={showCodeExecution}
+            prompt={prompt}
+            loading={loading}
+            responseTime={responseTime}
+            showTime={showTime}
+            onModelChange={setModel}
+            onTemperatureChange={setTemperature}
+            onNumCtxChange={setNumCtx}
+            onNumPredictChange={setNumPredict}
+            onStreamChange={setStream}
+            onThinkChange={setThink}
+            onSystemPromptContentChange={setSystemPromptContent}
+            onIsEditingSystemPromptChange={setIsEditingSystemPrompt}
+            onShowSystemPromptsChange={setShowSystemPrompts}
+            onShowTemplatesChange={setShowTemplates}
+            onShowModelComparisonChange={setShowModelComparison}
+            onShowCodeExecutionChange={setShowCodeExecution}
+            onPromptChange={setPrompt}
+            onSubmit={handleSubmit}
+            onClearMessages={() => {
+              setMessages([]);
+            }}
+          />
         </div>
       </div>
       
