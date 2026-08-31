@@ -30,6 +30,8 @@ export default function Index() {
   const [showSystemPrompts, setShowSystemPrompts] = useState(false);
   const [showModelComparison, setShowModelComparison] = useState(false);
   const [showCodeExecution, setShowCodeExecution] = useState(false);
+  const [showHistoryDialog, setShowHistoryDialog] = useState(false);
+  const [currentMessages, setCurrentMessages] = useState<Message[]>([]);
 
   const handleSelectTemplate = useCallback((content: string) => {
     setPrompt(content);
@@ -262,6 +264,10 @@ export default function Index() {
             onClearMessages={() => {
               setMessages([]);
             }}
+            showHistoryDialog={showHistoryDialog}
+            onShowHistoryDialogChange={setShowHistoryDialog}
+            onSaveChatSession={() => {}}
+            onLoadSession={() => {}}
           />
         </div>
       </div>

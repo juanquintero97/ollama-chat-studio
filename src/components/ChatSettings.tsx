@@ -43,6 +43,7 @@ interface ChatSettingsProps {
   showTemplates: boolean;
   showModelComparison: boolean;
   showCodeExecution: boolean;
+  showHistoryDialog: boolean;
   prompt: string;
   loading: boolean;
   responseTime: number | null;
@@ -59,9 +60,12 @@ interface ChatSettingsProps {
   onShowTemplatesChange: (value: boolean) => void;
   onShowModelComparisonChange: (value: boolean) => void;
   onShowCodeExecutionChange: (value: boolean) => void;
+  onShowHistoryDialogChange: (value: boolean) => void;
   onPromptChange: (value: string) => void;
   onSubmit: (e: React.FormEvent) => void;
   onClearMessages: () => void;
+  onSaveChatSession: () => void;
+  onLoadSession: () => void;
 }
 
 export function ChatSettings({
@@ -78,6 +82,7 @@ export function ChatSettings({
   showTemplates,
   showModelComparison,
   showCodeExecution,
+  showHistoryDialog,
   prompt,
   loading,
   responseTime,
@@ -94,9 +99,12 @@ export function ChatSettings({
   onShowTemplatesChange,
   onShowModelComparisonChange,
   onShowCodeExecutionChange,
+  onShowHistoryDialogChange,
   onPromptChange,
   onSubmit,
   onClearMessages,
+  onSaveChatSession,
+  onLoadSession,
 }: ChatSettingsProps) {
   return (
     <div className="w-full md:w-1/2 lg:w-1/3 bg-card rounded-lg p-4 flex flex-col space-y-4 max-h-[85vh] overflow-y-auto">
@@ -193,8 +201,8 @@ export function ChatSettings({
             numPredict,
             numCtx,
           }}
-          open={false}
-          onOpenChange={() => {}}
+          open={showHistoryDialog}
+          onOpenChange={onShowHistoryDialogChange}
           onLoad={() => {}}
           onClear={onClearMessages}
         />
