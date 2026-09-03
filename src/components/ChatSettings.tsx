@@ -2,8 +2,6 @@ import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
   DialogContent,
@@ -16,18 +14,6 @@ import { PromptTemplates } from './PromptTemplates';
 import { SystemPromptTemplates } from './SystemPromptTemplates';
 import { ModelComparison } from './ModelComparison';
 import { CodeExecution } from './CodeExecution';
-import {
-  Sparkles,
-  Settings,
-  History,
-  Copy,
-  Check,
-  X,
-  Plus,
-  Edit3,
-  Trash2,
-} from 'lucide-react';
-import { motion } from 'framer-motion';
 
 interface ChatSettingsProps {
   model: string;

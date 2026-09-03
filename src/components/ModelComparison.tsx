@@ -60,6 +60,7 @@ export function ModelComparison({
   const [prompt, setPrompt] = useState(currentPrompt);
   const [results, setResults] = useState<ComparisonResult[]>([]);
   const [isRunning, setIsRunning] = useState(false);
+  const [modelLoading, setModelLoading] = useState<Map<string, boolean>>(new Map());
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
   useEffect(() => {
@@ -107,10 +108,17 @@ export function ModelComparison({
 
     setIsRunning(true);
     setResults([]);
+    setModelLoading(new Map());
 
     const newResults: ComparisonResult[] = [];
 
     for (const model of selectedModels) {
+      setModelLoading(prev => {
+        const next = new Map(prev);
+        next.set(model, true);
+        return next;
+      });
+
       try {
         const { response, time } = await generateText(model);
         newResults.push({ model, response, responseTime: time });
@@ -122,6 +130,11 @@ export function ModelComparison({
           error: (error as Error).message,
         });
       }
+      setModelLoading(prev => {
+        const next = new Map(prev);
+        next.set(model, false);
+        return next;
+      });
       setResults([...newResults]);
     }
 

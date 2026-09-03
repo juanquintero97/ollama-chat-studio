@@ -1,9 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTheme } from 'next-themes';
-import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, User, Clock, Loader2, Copy, Check } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 
 import { Chat } from '../components/Chat';
 import { ChatSettings } from '../components/ChatSettings';
