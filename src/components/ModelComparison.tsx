@@ -95,7 +95,12 @@ export function ModelComparison({
     });
 
     if (!response.ok) {
-      throw new Error(`Error: ${response.status}`);
+      let errorMsg = `Error: ${response.status}`;
+      try {
+        const errorData = await response.json();
+        errorMsg = errorData.error || errorData.status || errorMsg;
+      } catch {}
+      throw new Error(errorMsg);
     }
 
     const data = await response.json();

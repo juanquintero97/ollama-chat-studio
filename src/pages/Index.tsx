@@ -69,7 +69,14 @@ export default function Index() {
     async function fetchModels() {
       try {
         const response = await fetch('http://localhost:11434/v1/models');
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        if (!response.ok) {
+          let errorMsg = `HTTP error! status: ${response.status}`;
+          try {
+            const errorData = await response.json();
+            errorMsg = errorData.error || errorData.message || errorMsg;
+          } catch {}
+          throw new Error(errorMsg);
+        }
         const data = await response.json();
         const modelNames = data.data.map((item: { id: string }) => item.id);
         modelNames.sort((a, b) => a.localeCompare(b));
@@ -119,8 +126,15 @@ export default function Index() {
         }),
       });
       
+      let apiError = null;
       if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
+        try {
+          const errorData = await response.json();
+          apiError = errorData.error || errorData.status || `Error: ${response.status}`;
+        } catch {
+          apiError = `Error: ${response.status}`;
+        }
+        throw new Error(apiError);
       }
       
       const data = await response.json();
