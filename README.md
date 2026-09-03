@@ -32,6 +32,7 @@ The combination of human oversight and AI assistance allowed for rapid iteration
 - **Response Time**: Shows elapsed time for each request
 - **Code Formatting**: Automatic detection and syntax highlighting for code blocks
 - **Copy to Clipboard**: One-click copy button for code snippets
+- **Error Handling**: Displays actual API error messages instead of just HTTP status codes
 
 ## Keyboard Shortcuts
 
