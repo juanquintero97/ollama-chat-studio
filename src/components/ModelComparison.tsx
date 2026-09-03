@@ -60,6 +60,7 @@ export function ModelComparison({
   const [prompt, setPrompt] = useState(currentPrompt);
   const [results, setResults] = useState<ComparisonResult[]>([]);
   const [isRunning, setIsRunning] = useState(false);
+  const [modelLoading, setModelLoading] = useState<Map<string, boolean>>(new Map());
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
   useEffect(() => {
@@ -81,9 +82,9 @@ export function ModelComparison({
       prompt,
       stream: false,
       options: {
-        num_ctx: numCtx,
+        num_ctx: parseInt(String(numCtx)),
         temperature,
-        num_predict: numPredict,
+        num_predict: parseInt(String(numPredict)),
       },
     };
 
@@ -94,7 +95,12 @@ export function ModelComparison({
     });
 
     if (!response.ok) {
-      throw new Error(`Error: ${response.status}`);
+      let errorMsg = `Error: ${response.status}`;
+      try {
+        const errorData = await response.json();
+        errorMsg = errorData.error || errorData.status || errorMsg;
+      } catch {}
+      throw new Error(errorMsg);
     }
 
     const data = await response.json();
@@ -107,10 +113,17 @@ export function ModelComparison({
 
     setIsRunning(true);
     setResults([]);
+    setModelLoading(new Map());
 
     const newResults: ComparisonResult[] = [];
 
     for (const model of selectedModels) {
+      setModelLoading(prev => {
+        const next = new Map(prev);
+        next.set(model, true);
+        return next;
+      });
+
       try {
         const { response, time } = await generateText(model);
         newResults.push({ model, response, responseTime: time });
@@ -122,6 +135,11 @@ export function ModelComparison({
           error: (error as Error).message,
         });
       }
+      setModelLoading(prev => {
+        const next = new Map(prev);
+        next.set(model, false);
+        return next;
+      });
       setResults([...newResults]);
     }
 

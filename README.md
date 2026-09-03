@@ -2,6 +2,18 @@
 
 A clean, minimal React chat application for interacting with the Ollama localhost API.
 
+## Built with AI Assistance
+
+This project was developed using AI pair programming tools to accelerate development and improve code quality. The AI assistant helped with:
+
+- Implementing advanced features (Keyboard Shortcuts, Prompt Templates, Model Comparison, Code Execution)
+- Debugging complex issues (Web Worker TypeScript compatibility, state management)
+- Writing documentation and code comments
+- Suggesting architectural improvements and best practices
+- Optimizing bundle size and performance
+
+The combination of human oversight and AI assistance allowed for rapid iteration while maintaining high code standards.
+
 ## Features
 
 - **Model Selection**: Dropdown populated from installed Ollama models
@@ -20,18 +32,18 @@ A clean, minimal React chat application for interacting with the Ollama localhos
 - **Response Time**: Shows elapsed time for each request
 - **Code Formatting**: Automatic detection and syntax highlighting for code blocks
 - **Copy to Clipboard**: One-click copy button for code snippets
+- **Error Handling**: Displays actual API error messages instead of just HTTP status codes
 
 ## Keyboard Shortcuts
 
 | Shortcut | Action |
 |----------|--------|
 | `Cmd + Enter` | Send the current prompt |
-| `Cmd + K` | Open command palette |
+| `Cmd + K` | Open keyboard shortcuts help |
 | `Cmd + /` | Focus the prompt textarea |
 | `Esc` | Clear focus / conversation |
 | `Cmd + D` | Toggle dark mode |
 | `Cmd + Shift + H` | Open chat history |
-- **Keyboard Shortcuts**: Quick access to common actions (Cmd+Enter to send, Cmd+K for command palette, Cmd+/ to focus prompt, Esc to clear)
 
 ## Prerequisites
 
@@ -140,9 +152,16 @@ Request payload structure:
 ```
 src/
 ├── components/
-│   └── Chat.tsx          # Message display component
+│   ├── Chat.tsx                   # Message display component
+│   ├── ChatHistory.tsx            # Save/load chat sessions
+│   ├── CodeExecution.tsx          # JavaScript sandbox with Web Worker
+│   ├── DarkModeToggle.tsx         # Light/Dark/System theme
+│   ├── KeyboardShortcuts.tsx      # Shortcuts dialog and badge
+│   ├── ModelComparison.tsx        # Side-by-side model comparison
+│   ├── PromptTemplates.tsx        # User prompt templates
+│   └── SystemPromptTemplates.tsx  # System prompt templates
 ├── pages/
-│   └── Index.tsx         # Main page with form and handlers
+│   └── Index.tsx                  # Main page with form and handlers
 └── lib/
     (utilities, if any)
 
@@ -169,6 +188,12 @@ tsconfig.json             # TypeScript configuration
 
 - Toggle the "Enable streaming response" checkbox
 - Some older models may not support streaming
+
+### Code Execution not responding
+
+- Ensure JavaScript code is being executed (TypeScript requires compilation)
+- If code hangs, the 5-second timeout will terminate it automatically
+- Infinite loops are caught by the timeout mechanism
 
 ## License
 
