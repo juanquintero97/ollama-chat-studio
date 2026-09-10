@@ -101,16 +101,14 @@ export function ChatSettings({
 
       {/* System Prompt */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-        <div className="flex justify-between items-center mb-2">
-          <div className="flex items-center gap-2">
-            <h3 className="text-base md:text-sm font-medium text-blue-900">System Prompt</h3>
-            <Button
-              onClick={() => onIsEditingSystemPromptChange(!isEditingSystemPrompt)}
-              className="text-sm md:text-xs bg-blue-600 text-white px-3 py-1.5 md:px-2 md:py-1 rounded hover:bg-blue-700 transition-colors min-h-[36px] md:min-h-0 justify-end"
-            >
-              {isEditingSystemPrompt ? 'Cancel' : 'Edit'}
-            </Button>
-          </div>
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-base md:text-sm font-medium text-blue-900">System Prompt</h3>
+          <Button
+            onClick={() => onIsEditingSystemPromptChange(!isEditingSystemPrompt)}
+            className="text-sm md:text-xs bg-blue-600 text-white px-2 rounded hover:bg-blue-700 transition-colors h-5 ml-auto"
+          >
+            {isEditingSystemPrompt ? 'Cancel' : 'Edit'}
+          </Button>
         </div>
         <div className="flex items-center justify-between mb-2">
           <SystemPromptTemplates
@@ -329,7 +327,7 @@ export function ChatSettings({
           <Button
             type="submit"
             disabled={loading}
-            className="self-end bg-primary text-white rounded-md px-4 py-2 text-sm font-medium hover:bg-primary/80 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors min-h-[40px] md:min-h-0"
+            className="self-end bg-primary text-white dark:text-black rounded-md px-4 py-2 text-sm font-medium hover:bg-primary/80 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors min-h-[40px] md:min-h-0"
           >
             {loading ? 'Sending...' : 'Send'}
           </Button>
