@@ -123,6 +123,83 @@ npm run build
 
 This creates a static build in the `dist/` directory, ready to be served.
 
+## Docker Deployment
+
+### Prerequisites
+
+- Docker installed
+- Ollama running locally (or available on the network)
+
+### Option 1: Run with Ollama on the same machine
+
+```bash
+docker build -t ollama-chat-studio .
+docker run -p 8080:80 ollama-chat-studio
+```
+
+### Option 2: Run with Docker Compose (includes Ollama)
+
+```bash
+docker compose up -d
+```
+
+This starts both the chat app and Ollama service together. Models are stored in a Docker volume.
+
+### Option 3: Build and run manually
+
+```bash
+# Build the Docker image
+docker build -t ollama-chat-studio .
+
+# Run with Ollama on the same machine
+docker run -p 8080:80 ollama-chat-studio
+
+# Run with custom Ollama host
+docker run -p 8080:80 -e OLLAMA_HOST=http://192.168.1.100:11434 ollama-chat-studio
+```
+
+After starting, open http://localhost:8080 in your browser.
+
+### Configuration
+
+The application connects to Ollama at `http://localhost:11434` by default. If your Ollama instance runs on a different host/port, you can:
+
+1. Create a `.env` file in the project root
+2. Add the following (if supported in future versions):
+   ```env
+   VITE_OLLAMA_HOST=your-host:port
+   ```
+
+## Production Build Optimization
+
+The application is built with Vite and optimized for production by default:
+
+- **Code splitting**: Vite automatically splits the bundle into optimized chunks
+- **Tree shaking**: Unused code is removed during the build process
+- **Minification**: JavaScript, CSS, and HTML are minified
+- **Asset optimization**: Static assets are fingerprinted for long-term caching
+
+### Build verification
+
+```bash
+pnpm run build
+```
+
+### Preview the production build locally
+
+```bash
+pnpm run preview
+```
+
+This serves the built files from `dist/` on port 8080.
+
+### Performance notes
+
+- The app is designed to run offline with locally installed Ollama models
+- No internet connection is required for the UI once built
+- Ollama API calls are made directly to `http://localhost:11434`
+- For remote Ollama instances, configure the host/port in your environment
+
 ## API Integration
 
 The application communicates with Ollama's REST API:
@@ -150,24 +227,34 @@ Request payload structure:
 ## Project Structure
 
 ```
-src/
-├── components/
-│   ├── Chat.tsx                   # Message display component
-│   ├── ChatHistory.tsx            # Save/load chat sessions
-│   ├── CodeExecution.tsx          # JavaScript sandbox with Web Worker
-│   ├── DarkModeToggle.tsx         # Light/Dark/System theme
-│   ├── KeyboardShortcuts.tsx      # Shortcuts dialog and badge
-│   ├── ModelComparison.tsx        # Side-by-side model comparison
-│   ├── PromptTemplates.tsx        # User prompt templates
-│   └── SystemPromptTemplates.tsx  # System prompt templates
-├── pages/
-│   └── Index.tsx                  # Main page with form and handlers
-└── lib/
-    (utilities, if any)
-
-tailwind.config.ts        # Tailwind CSS configuration
-vite.config.ts            # Vite bundler configuration
-tsconfig.json             # TypeScript configuration
+ollama-chat-studio/
+├── src/
+│   ├── components/
+│   │   ├── Chat.tsx                   # Message display component
+│   │   ├── ChatHistory.tsx            # Save/load chat sessions
+│   │   ├── CodeExecution.tsx          # JavaScript sandbox with Web Worker
+│   │   ├── DarkModeToggle.tsx         # Light/Dark/System theme
+│   │   ├── KeyboardShortcuts.tsx      # Shortcuts dialog and badge
+│   │   ├── ModelComparison.tsx        # Side-by-side model comparison
+│   │   ├── PromptTemplates.tsx        # User prompt templates
+│   │   └── SystemPromptTemplates.tsx  # System prompt templates
+│   ├── pages/
+│   │   └── Index.tsx                  # Main page with form and handlers
+│   └── lib/
+│       └── utils.ts                   # Utility functions (cn, etc.)
+├── src/test/
+│   └── setup.ts                       # Vitest setup file
+├── src/utils/
+│   └── toast.ts                       # Toast notification helpers
+├── public/                            # Static assets
+├── dist/                              # Production build output
+├── Dockerfile                         # Docker configuration for production
+├── docker-compose.yml                 # Docker Compose for local development
+├── nginx.conf                         # Nginx configuration for production
+├── tailwind.config.ts                 # Tailwind CSS configuration
+├── vite.config.ts                     # Vite bundler configuration
+├── tsconfig.json                      # TypeScript configuration
+└── package.json                       # Dependencies and scripts
 ```
 
 ## Troubleshooting
